@@ -23,6 +23,7 @@ class FlutterDocScannerWeb extends FlutterDocScannerPlatform {
     final version = html.window.navigator.userAgent;
     return version;
   }
+
   @override
   Future<String?> getScanDocuments() async {
     final data = html.window.navigator.userAgent;

@@ -11,13 +11,14 @@ class MethodChannelFlutterDocScanner extends FlutterDocScannerPlatform {
 
   @override
   Future<String?> getPlatformVersion() async {
-    final version = await methodChannel.invokeMethod<String>('getPlatformVersion');
+    final version =
+        await methodChannel.invokeMethod<String>('getPlatformVersion');
     return version;
   }
+
   @override
   Future<dynamic> getScanDocuments() async {
     final data = await methodChannel.invokeMethod<dynamic>('getScanDocuments');
     return data;
   }
-
 }

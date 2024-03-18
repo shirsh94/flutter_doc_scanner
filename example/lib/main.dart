@@ -29,7 +29,7 @@ class _MyAppState extends State<MyApp> {
     } on PlatformException {
       scannedDocuments = 'Failed to get scanned documents.';
     }
-    // print(scannedDocuments.toString());
+    print(scannedDocuments.toString());
     if (!mounted) return;
     setState(() {
       _scannedDocuments = scannedDocuments;
