@@ -1,7 +1,6 @@
 ## 0.0.2
 
 - Added support for retrieving document files from a URI.
-- 
 ## 0.0.1
 
 - Initial release of the `flutter_doc_scanner` plugin.

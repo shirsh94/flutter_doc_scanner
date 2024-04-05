@@ -46,7 +46,7 @@ print(scannedDocuments.toString());
 
 ## Screenshots
 
-![Screenshot 1](https://github.com/shirsh94/flutter_doc_scanner/blob/main/demo/screen_shot_1.jpg) ![Screenshot 2](https://github.com/shirsh94/flutter_doc_scanner/blob/main/demo/screen_shot_2.jpg)
+| ![Screenshot 1](https://github.com/shirsh94/flutter_doc_scanner/blob/main/demo/screen_shot_1.jpg) | ![Screenshot 2](https://github.com/shirsh94/flutter_doc_scanner/blob/main/demo/screen_shot_2.jpg) |
 
 ## Issues and Feedback
 
