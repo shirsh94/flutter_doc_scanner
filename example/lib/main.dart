@@ -82,7 +82,7 @@ class _MyAppState extends State<MyApp> {
                   onPressed: () {
                     scanDocumentUri();
                   },
-                  child: const Text("Scan Documents URI"),
+                  child: const Text("Get Scan Documents URI"),
                 ),
               ),
             ],
