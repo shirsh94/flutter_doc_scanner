@@ -8,4 +8,7 @@ class FlutterDocScanner {
   Future<dynamic> getScanDocuments() {
     return FlutterDocScannerPlatform.instance.getScanDocuments();
   }
+  Future<dynamic> getScanDocumentsUri() {
+    return FlutterDocScannerPlatform.instance.getScanDocumentsUri();
+  }
 }

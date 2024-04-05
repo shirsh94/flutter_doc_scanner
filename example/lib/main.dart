@@ -1,30 +1,40 @@
 import 'package:flutter/material.dart';
-import 'dart:async';
-
 import 'package:flutter/services.dart';
 import 'package:flutter_doc_scanner/flutter_doc_scanner.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatefulWidget {
-  const MyApp({super.key});
+  MyApp({Key? key}) : super(key: key);
+
   @override
   State<MyApp> createState() => _MyAppState();
 }
 
 class _MyAppState extends State<MyApp> {
   dynamic _scannedDocuments;
-  @override
-  void initState() {
-    super.initState();
-  }
 
   Future<void> scanDocument() async {
     dynamic scannedDocuments;
     try {
       scannedDocuments = await FlutterDocScanner().getScanDocuments() ??
+          'Unknown platform documents';
+    } on PlatformException {
+      scannedDocuments = 'Failed to get scanned documents.';
+    }
+    print(scannedDocuments.toString());
+    if (!mounted) return;
+    setState(() {
+      _scannedDocuments = scannedDocuments;
+    });
+  }
+
+  Future<void> scanDocumentUri() async {
+    dynamic scannedDocuments;
+    try {
+      scannedDocuments = await FlutterDocScanner().getScanDocumentsUri() ??
           'Unknown platform documents';
     } on PlatformException {
       scannedDocuments = 'Failed to get scanned documents.';
@@ -52,11 +62,31 @@ class _MyAppState extends State<MyApp> {
             ],
           ),
         ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            scanDocument();
-          },
-          child: const Text("Scan Documents"),
+        floatingActionButton: Padding(
+          padding: const EdgeInsets.only(bottom: 16.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                child: ElevatedButton(
+                  onPressed: () {
+                    scanDocument();
+                  },
+                  child: const Text("Scan Documents"),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                child: ElevatedButton(
+                  onPressed: () {
+                    scanDocumentUri();
+                  },
+                  child: const Text("Scan Documents URI"),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
