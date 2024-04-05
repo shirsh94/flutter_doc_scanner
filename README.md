@@ -19,7 +19,7 @@ To use this plugin, add `flutter_doc_scanner` as a dependency in your `pubspec.y
 dependencies:
   flutter:
     sdk: flutter
-  flutter_doc_scanner: ^0.0.1
+  flutter_doc_scanner: ^0.0.2
 ```
 
 ## Usage
@@ -41,6 +41,14 @@ print(scannedDocuments.toString());
 ## Example
 
 Check out the `example` directory for a sample Flutter app using `flutter_doc_scanner`.
+
+![Document Scanner Demo](https://github.com/shirsh94/flutter_doc_scanner/blob/main/demo/doc_scan_demo.gif)
+
+### Android Example
+![Android Example](https://github.com/shirsh94/flutter_doc_scanner/blob/main/demo/android_demo.png)
+
+### iOS Example
+![iOS Example](https://github.com/shirsh94/flutter_doc_scanner/blob/main/demo/ios.jpg)
 
 ## Issues and Feedback
 
@@ -64,5 +72,6 @@ NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPO
 NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES
 OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+```
 
-
+This should improve the visual appeal and clarity of your README.md file.
