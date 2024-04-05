@@ -1,6 +1,11 @@
+Sure, here is your README.md file with the GIF added at the top:
+
+```markdown
 # flutter_doc_scanner
 
 A Flutter plugin for document scanning on Android and iOS using ML Kit Document Scanner API and VisionKit.
+
+![Document Scanner Demo](https://github.com/shirsh94/flutter_doc_scanner/blob/main/demo/doc_scan_demo.gif)
 
 ## Features
 
@@ -42,8 +47,6 @@ print(scannedDocuments.toString());
 
 Check out the `example` directory for a sample Flutter app using `flutter_doc_scanner`.
 
-![Document Scanner Demo](https://github.com/shirsh94/flutter_doc_scanner/blob/main/demo/doc_scan_demo.gif)
-
 ### Android Example
 ![Android Example](https://github.com/shirsh94/flutter_doc_scanner/blob/main/demo/android_demo.png)
 
@@ -72,6 +75,3 @@ NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPO
 NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES
 OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
 CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-```
-
-This should improve the visual appeal and clarity of your README.md file.
