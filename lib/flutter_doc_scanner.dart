@@ -14,7 +14,8 @@ class FlutterDocScanner {
     if (defaultTargetPlatform == TargetPlatform.iOS) {
       return FlutterDocScannerPlatform.instance.getScanDocumentsUri();
     } else {
-      return Future.error("Currently, this feature is supported only on Android Platform,");
+      return Future.error(
+          "Currently, this feature is supported only on Android Platform,");
     }
   }
 }

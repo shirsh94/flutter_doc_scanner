@@ -30,6 +30,7 @@ abstract class FlutterDocScannerPlatform extends PlatformInterface {
   Future<dynamic> getScanDocuments() {
     throw UnimplementedError('ScanDocuments() has not been implemented.');
   }
+
   Future<dynamic> getScanDocumentsUri() {
     throw UnimplementedError('ScanDocuments() has not been implemented.');
   }
