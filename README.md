@@ -25,7 +25,7 @@ To use this plugin, add `flutter_doc_scanner` as a dependency in your `pubspec.y
 dependencies:
   flutter:
     sdk: flutter
-  flutter_doc_scanner: ^0.0.2
+  flutter_doc_scanner: ^0.0.3
 ```
 
 ## Usage
@@ -44,11 +44,9 @@ try {
 print(scannedDocuments.toString());
 ```
 
-### Android Example
-![Android Example](https://github.com/shirsh94/flutter_doc_scanner/blob/main/demo/android_demo.png)
+## Screenshots
 
-### iOS Example
-![iOS Example](https://github.com/shirsh94/flutter_doc_scanner/blob/main/demo/ios.jpg)
+| ![Screenshot 1](https://github.com/shirsh94/flutter_doc_scanner/blob/main/demo/screen_shot_1.jpg)  | ![Screenshot 2](https://github.com/shirsh94/flutter_doc_scanner/blob/main/demo/screen_shot_2.jpg) 
 
 ## Issues and Feedback
 
