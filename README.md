@@ -7,12 +7,12 @@ A Flutter plugin for document scanning on Android and iOS using ML Kit Document 
 Check out the `example` directory for a sample Flutter app using `flutter_doc_scanner`.
 
 ## Document Scanner Demo
-![Document Scanner Demo](https://github.com/shirsh94/flutter_doc_scanner/blob/main/demo/doc_scan_demo.gif)
+![Document Scanner Demo](https://raw.githubusercontent.com/shirsh94/flutter_doc_scanner/blob/main/demo/doc_scan_demo.gif)
 
 ## Screenshots
-| ![Screenshot 1](https://raw.githubusercontent.com/shirsh94/country_picker_pro/main/assets/Screenshot_first.jpg)  | ![Screenshot 2](https://github.com/shirsh94/country_picker_pro/blob/main/assets/Screenshot_second.jpg?raw=true) | ![Screenshot 3](https://github.com/shirsh94/country_picker_pro/blob/main/assets/Screenshot_third.jpg?raw=true) |
-|------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------|
-| ![Screenshot 4](https://raw.githubusercontent.com/shirsh94/country_picker_pro/main/assets/Screenshot_fourth.jpg) | ![Screenshot 5](https://github.com/shirsh94/country_picker_pro/blob/main/assets/Screenshot_fifth.jpg?raw=true)  | ![Screenshot 6](https://github.com/shirsh94/country_picker_pro/blob/main/assets/Screenshot_sixth.jpg?raw=true) |
+| ![Screenshot 1](https://raw.githubusercontent.com/shirsh94/flutter_doc_scanner/main/demo/screen_shot_1.jpg?raw=true) | ![Screenshot 2](https://raw.githubusercontent.com/shirsh94/flutter_doc_scanner/main/demo/screen_shot_2.jpg?raw=true) | ![Screenshot 3](https://raw.githubusercontent.com/shirsh94/flutter_doc_scanner/main/demo/screen_shot_3.jpg?raw=true) |
+|----------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------|
+| ![Screenshot 4](https://raw.githubusercontent.com/shirsh94/flutter_doc_scanner/main/demo/screen_shot_4.jpg?raw=true) | ![Screenshot 5](https://raw.githubusercontent.com/shirsh94/flutter_doc_scanner/main/demo/screen_shot_5.jpg?raw=true) | ![Screenshot 6](https://raw.githubusercontent.com/shirsh94/flutter_doc_scanner/main/demo/screen_shot_6.jpg?raw=true) |
 
 
 ## Features
