@@ -7,7 +7,7 @@ A Flutter plugin for document scanning on Android and iOS using ML Kit Document 
 Check out the `example` directory for a sample Flutter app using `flutter_doc_scanner`.
 
 ## Document Scanner Demo
-![Document Scanner Demo](https://raw.githubusercontent.com/shirsh94/flutter_doc_scanner/blob/main/demo/doc_scan_demo.gif)
+![Document Scanner Demo](https://github.com/shirsh94/flutter_doc_scanner/blob/main/demo/doc_scan_demo.gif)
 
 ## Screenshots
 | ![Screenshot 1](https://raw.githubusercontent.com/shirsh94/flutter_doc_scanner/main/demo/screen_shot_1.jpg?raw=true) | ![Screenshot 2](https://raw.githubusercontent.com/shirsh94/flutter_doc_scanner/main/demo/screen_shot_2.jpg?raw=true) | ![Screenshot 3](https://raw.githubusercontent.com/shirsh94/flutter_doc_scanner/main/demo/screen_shot_3.jpg?raw=true) |
@@ -32,7 +32,7 @@ To use this plugin, add `flutter_doc_scanner` as a dependency in your `pubspec.y
 dependencies:
   flutter:
     sdk: flutter
-  flutter_doc_scanner: ^0.0.3
+  flutter_doc_scanner: ^0.0.4
 ```
 
 ## Usage
@@ -50,10 +50,6 @@ try {
 }
 print(scannedDocuments.toString());
 ```
-
-## Screenshots
-
-| ![Screenshot 1](https://github.com/shirsh94/flutter_doc_scanner/blob/main/demo/screen_shot_1.jpg) | ![Screenshot 2](https://github.com/shirsh94/flutter_doc_scanner/blob/main/demo/screen_shot_2.jpg) |
 
 ## Issues and Feedback
 
