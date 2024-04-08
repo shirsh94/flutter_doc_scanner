@@ -11,7 +11,7 @@ class FlutterDocScanner {
   }
 
   Future<dynamic> getScanDocumentsUri() {
-    if (defaultTargetPlatform == TargetPlatform.iOS) {
+    if (defaultTargetPlatform == TargetPlatform.android) {
       return FlutterDocScannerPlatform.instance.getScanDocumentsUri();
     } else {
       return Future.error(
