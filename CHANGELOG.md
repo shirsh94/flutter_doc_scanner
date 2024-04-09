@@ -1,4 +1,10 @@
+## 0.0.5
+- Fixed Ios major bugs.
+
 ## 0.0.4
+- Fixed Android bugs.
+
+## 0.0.3
 - Added support for retrieving document files from a URI.
 
 ## 0.0.2
