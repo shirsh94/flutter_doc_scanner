@@ -40,7 +40,7 @@ flutter:
         package: com.shirsh.flutter_doc_scanner
         pluginClass: FlutterDocScannerPlugin
       ios:
-        pluginClass: FlutterDocScannerPlugin
+        pluginClass: SwiftFlutterDocScannerPlugin
       linux:
         pluginClass: FlutterDocScannerPlugin
       macos:
