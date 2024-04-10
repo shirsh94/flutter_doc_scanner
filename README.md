@@ -2,12 +2,16 @@
 
 A Flutter plugin for document scanning on Android and iOS using ML Kit Document Scanner API and VisionKit.
 
+[![pub package](https://img.shields.io/pub/v/flutter_doc_scanner.svg)](https://pub.dev/packages/flutter_doc_scanner)
+
 ## Example
 
 Check out the `example` directory for a sample Flutter app using `flutter_doc_scanner`.
 
 ## Document Scanner Demo
-![Document Scanner Demo](https://github.com/shirsh94/flutter_doc_scanner/blob/main/demo/doc_scan_demo.gif)
+<p align="center">
+	<img src="https://github.com/shirsh94/flutter_doc_scanner/blob/main/demo/doc_scan_demo.gif?raw=true" width="200"  />
+</p>
 
 ## Screenshots
 | ![Screenshot 1](https://raw.githubusercontent.com/shirsh94/flutter_doc_scanner/main/demo/screen_shot_1.jpg?raw=true) | ![Screenshot 2](https://raw.githubusercontent.com/shirsh94/flutter_doc_scanner/main/demo/screen_shot_2.jpg?raw=true) | ![Screenshot 3](https://raw.githubusercontent.com/shirsh94/flutter_doc_scanner/main/demo/screen_shot_3.jpg?raw=true) |
@@ -22,7 +26,6 @@ Check out the `example` directory for a sample Flutter app using `flutter_doc_sc
 - Flexible functionality allows users to crop scanned documents, apply filters, remove fingers, remove stains and other blemishes.
 - On-device processing helps preserve privacy.
 - Support for sending digitized files in PDF and JPEG formats back to your app.
-- No need for camera permission.
 
 ## Installation
 
