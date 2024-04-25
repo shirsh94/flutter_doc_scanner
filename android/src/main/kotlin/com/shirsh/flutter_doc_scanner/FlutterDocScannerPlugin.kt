@@ -141,23 +141,19 @@ class FlutterDocScannerPlugin : MethodCallHandler, ActivityResultListener,
                     mapOf(
                         "pdfUri" to pdfUri.toString(),
                         "pageCount" to pageCount,
-                        "pageCount" to pageCount
                     )
                 )
             }
         } else if (requestCode == REQUEST_CODE_SCAN_URI && resultCode == Activity.RESULT_OK) {
             val scanningResult = GmsDocumentScanningResult.fromActivityResultIntent(data)
             scanningResult?.getPages()?.let { pages ->
-                for (page in pages) {
-                    val pageCount = pages.size;
-                    val imageUri = page.getImageUri()
-                    resultChannel.success(
-                        mapOf(
-                            "Uri" to imageUri.toString(),
-                            "Count" to pageCount,
-                        )
+                resultChannel.success(
+                    mapOf(
+                        "Uri" to pages.toString(),
+                        "Count" to pages.size,
                     )
-                }
+                )
+                return@let true
             }
         } else {
             resultChannel.error("SCAN_FAILED", "Failed to start scanning", null)

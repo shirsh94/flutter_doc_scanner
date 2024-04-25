@@ -1,3 +1,6 @@
+## 0.0.6
+- Fixed Android minor bugs.
+- 
 ## 0.0.5
 - Fixed Ios major bugs.
 
