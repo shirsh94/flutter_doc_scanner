@@ -43,8 +43,8 @@ class FlutterDocScannerPlugin : MethodCallHandler, ActivityResultListener,
     private var activity: Activity? = null
     private val TAG = FlutterDocScannerPlugin::class.java.simpleName
 
-    private val REQUEST_CODE_SCAN = 213
-    private val REQUEST_CODE_SCAN_URI = 214
+    private val REQUEST_CODE_SCAN = 213312
+    private val REQUEST_CODE_SCAN_URI = 214412
     private lateinit var resultChannel: MethodChannel.Result
 
 

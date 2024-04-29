@@ -1,3 +1,6 @@
+## 0.0.7
+- Updated Android request code to resolve conflicts with other libraries.
+
 ## 0.0.6
 - Fixed Android minor bugs.
 - 
