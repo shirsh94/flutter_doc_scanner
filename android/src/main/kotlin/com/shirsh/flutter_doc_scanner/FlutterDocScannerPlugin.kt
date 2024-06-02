@@ -155,7 +155,7 @@ class FlutterDocScannerPlugin : MethodCallHandler, ActivityResultListener,
                 )
                 return@let true
             }
-        } else {
+        } else if (requestCode == REQUEST_CODE_SCAN || requestCode == REQUEST_CODE_SCAN_URI) {
             resultChannel.error("SCAN_FAILED", "Failed to start scanning", null)
         }
         return false
