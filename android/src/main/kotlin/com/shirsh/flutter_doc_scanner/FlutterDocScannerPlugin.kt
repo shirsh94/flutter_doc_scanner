@@ -132,29 +132,28 @@ class FlutterDocScannerPlugin : MethodCallHandler, ActivityResultListener,
 
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?): Boolean {
-        if (requestCode == REQUEST_CODE_SCAN && resultCode == Activity.RESULT_OK) {
+        if ((requestCode == REQUEST_CODE_SCAN || requestCode == REQUEST_CODE_SCAN_URI) 
+            && resultCode == Activity.RESULT_OK) {
             val scanningResult = GmsDocumentScanningResult.fromActivityResultIntent(data)
-            scanningResult?.getPdf()?.let { pdf ->
-                val pdfUri = pdf.getUri()
-                val pageCount = pdf.getPageCount()
-                resultChannel.success(
-                    mapOf(
-                        "pdfUri" to pdfUri.toString(),
-                        "pageCount" to pageCount,
-                    )
-                )
+            
+            // Get PDF data
+            val pdfUri = scanningResult?.getPdf()?.getUri()?.toString()
+            val pageCount = scanningResult?.getPdf()?.getPageCount()
+            
+            // Get individual page URIs
+            val pageUris = scanningResult?.getPages()?.map { page -> 
+                page.getImageUri().toString()
             }
-        } else if (requestCode == REQUEST_CODE_SCAN_URI && resultCode == Activity.RESULT_OK) {
-            val scanningResult = GmsDocumentScanningResult.fromActivityResultIntent(data)
-            scanningResult?.getPages()?.let { pages ->
-                resultChannel.success(
-                    mapOf(
-                        "Uri" to pages.toString(),
-                        "Count" to pages.size,
-                    )
+
+            resultChannel.success(
+                mapOf(
+                    "pdfUri" to pdfUri,
+                    "pageCount" to pageCount,
+                    "Uri" to pageUris?.joinToString(", "),
+                    "Count" to pageUris?.size
                 )
-                return@let true
-            }
+            )
+            return true
         } else if (requestCode == REQUEST_CODE_SCAN || requestCode == REQUEST_CODE_SCAN_URI) {
             resultChannel.error("SCAN_FAILED", "Failed to start scanning", null)
         }
