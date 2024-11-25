@@ -40,14 +40,22 @@ public class SwiftFlutterDocScannerPlugin: NSObject, FlutterPlugin, VNDocumentCa
         let df = DateFormatter()
         df.dateFormat = "yyyyMMdd-HHmmss"
         let formattedDate = df.string(from: currentDateTime)
-        var filenames: [String] = []
+        var pageUris: [String] = []
+        
         for i in 0 ... scan.pageCount - 1 {
             let page = scan.imageOfPage(at: i)
             let url = tempDirPath.appendingPathComponent(formattedDate + "-\(i).png")
             try? page.pngData()?.write(to: url)
-            filenames.append(url.path)
+            pageUris.append(url.path)
         }
-        resultChannel?(filenames)
+        
+        // Return in the same format as Android
+        let result: [String: Any] = [
+            "Uri": pageUris.joined(separator: ", "),
+            "Count": pageUris.count
+        ]
+        
+        resultChannel?(result)
         presentingController?.dismiss(animated: true)
     }
 
@@ -57,7 +65,9 @@ public class SwiftFlutterDocScannerPlugin: NSObject, FlutterPlugin, VNDocumentCa
     }
 
     public func documentCameraViewController(_ controller: VNDocumentCameraViewController, didFailWithError error: Error) {
-        resultChannel?(nil)
+        resultChannel?(FlutterError(code: "SCAN_ERROR",
+                                   message: error.localizedDescription,
+                                   details: nil))
         presentingController?.dismiss(animated: true)
     }
 }

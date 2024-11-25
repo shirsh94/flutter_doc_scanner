@@ -7,6 +7,7 @@ import 'dart:html' as html show window;
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 
 import 'flutter_doc_scanner_platform_interface.dart';
+import 'models/scan_result.dart';
 
 /// A web implementation of the FlutterDocScannerPlatform of the FlutterDocScanner plugin.
 class FlutterDocScannerWeb extends FlutterDocScannerPlatform {
@@ -25,14 +26,14 @@ class FlutterDocScannerWeb extends FlutterDocScannerPlatform {
   }
 
   @override
-  Future<String?> getScanDocuments() async {
-    final data = html.window.navigator.userAgent;
-    return data;
+  Future<DocumentScanResult?> getScanDocuments() async {
+    // Web implementation doesn't support document scanning
+    throw UnimplementedError('Document scanning is not supported on web');
   }
 
   @override
-  Future<String?> getScanDocumentsUri() async {
-    final data = html.window.navigator.userAgent;
-    return data;
+  Future<DocumentScanResult?> getScanDocumentsUri() async {
+    // Web implementation doesn't support document scanning
+    throw UnimplementedError('Document scanning is not supported on web');
   }
 }

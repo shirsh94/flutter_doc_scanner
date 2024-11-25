@@ -1,6 +1,7 @@
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
 import 'flutter_doc_scanner_method_channel.dart';
+import 'models/scan_result.dart';
 
 abstract class FlutterDocScannerPlatform extends PlatformInterface {
   /// Constructs a FlutterDocScannerPlatform.
@@ -27,11 +28,11 @@ abstract class FlutterDocScannerPlatform extends PlatformInterface {
     throw UnimplementedError('platformVersion() has not been implemented.');
   }
 
-  Future<dynamic> getScanDocuments() {
+  Future<DocumentScanResult?> getScanDocuments() {
     throw UnimplementedError('ScanDocuments() has not been implemented.');
   }
 
-  Future<dynamic> getScanDocumentsUri() {
+  Future<DocumentScanResult?> getScanDocumentsUri() {
     throw UnimplementedError('ScanDocuments() has not been implemented.');
   }
 }

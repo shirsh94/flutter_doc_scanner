@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
 import 'flutter_doc_scanner_platform_interface.dart';
+import 'models/scan_result.dart';
 
 /// An implementation of [FlutterDocScannerPlatform] that uses method channels.
 class MethodChannelFlutterDocScanner extends FlutterDocScannerPlatform {
@@ -17,15 +18,16 @@ class MethodChannelFlutterDocScanner extends FlutterDocScannerPlatform {
   }
 
   @override
-  Future<dynamic> getScanDocuments() async {
-    final data = await methodChannel.invokeMethod<dynamic>('getScanDocuments');
-    return data;
+  Future<DocumentScanResult?> getScanDocuments() async {
+    final Map<String, dynamic>? result = 
+        await methodChannel.invokeMapMethod<String, dynamic>('getScanDocuments');
+    return result != null ? DocumentScanResult.fromMap(result) : null;
   }
 
   @override
-  Future<dynamic> getScanDocumentsUri() async {
-    final data =
-        await methodChannel.invokeMethod<dynamic>('getScanDocumentsUri');
-    return data;
+  Future<DocumentScanResult?> getScanDocumentsUri() async {
+    final Map<String, dynamic>? result = 
+        await methodChannel.invokeMapMethod<String, dynamic>('getScanDocumentsUri');
+    return result != null ? DocumentScanResult.fromMap(result) : null;
   }
 }
