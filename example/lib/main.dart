@@ -15,16 +15,16 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  dynamic _scannedDocuments;
+  DocumentScanResult? _scannedDocuments;
 
   Future<void> scanDocument() async {
     DocumentScanResult? scannedDocuments;
     try {
-      scannedDocuments = await FlutterDocScanner().getScanDocuments() ??
-          'Unknown platform documents';
+      scannedDocuments = await FlutterDocScanner().getScanDocuments();
     } on PlatformException {
       print('Failed to get scanned documents.');
     }
+    
     print(scannedDocuments.toString());
     if (!mounted) return;
     setState(() {
@@ -35,8 +35,7 @@ class _MyAppState extends State<MyApp> {
   Future<void> scanDocumentUri() async {
     DocumentScanResult? scannedDocuments;
     try {
-      scannedDocuments = await FlutterDocScanner().getScanDocumentsUri() ??
-          'Unknown platform documents';
+      scannedDocuments = await FlutterDocScanner().getScanDocumentsUri();
     } on PlatformException {
       print('Failed to get scanned documents.');
     }

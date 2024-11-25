@@ -24,4 +24,9 @@ class DocumentScanResult {
       'Uri': pageUris?.join(', '),
     };
   }
+
+  @override
+  String toString() {
+    return 'DocumentScanResult(pdfUri: $pdfUri, pageCount: $pageCount, pageUris: $pageUris)';
+  }
 }

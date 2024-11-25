@@ -1,4 +1,6 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter_doc_scanner/models/scan_result.dart';
+
 import 'flutter_doc_scanner_platform_interface.dart';
 
 class FlutterDocScanner {
@@ -6,11 +8,11 @@ class FlutterDocScanner {
     return FlutterDocScannerPlatform.instance.getPlatformVersion();
   }
 
-  Future<dynamic> getScanDocuments() {
+  Future<DocumentScanResult?> getScanDocuments() {
     return FlutterDocScannerPlatform.instance.getScanDocuments();
   }
 
-  Future<dynamic> getScanDocumentsUri() {
+  Future<DocumentScanResult?> getScanDocumentsUri() {
     if (defaultTargetPlatform == TargetPlatform.android) {
       return FlutterDocScannerPlatform.instance.getScanDocumentsUri();
     } else {
