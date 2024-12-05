@@ -1,3 +1,6 @@
+## 0.0.8
+- Updated the library to Flutter 3.5.4.
+
 ## 0.0.7
 - Updated Android request code to resolve conflicts with other libraries.
 
