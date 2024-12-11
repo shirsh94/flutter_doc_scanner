@@ -1,5 +1,11 @@
-## 0.0.8
+## 0.0.10
+- Added Web Support.
+
+## 0.0.9
 - Updated the library to Flutter 3.5.4.
+
+## 0.0.8
+- Fixed minor bugs.
 
 ## 0.0.7
 - Updated Android request code to resolve conflicts with other libraries.

@@ -1,6 +1,6 @@
 # flutter_doc_scanner
 
-A Flutter plugin for document scanning on Android and iOS using ML Kit Document Scanner API and VisionKit.
+A Flutter plugin for document scanning on Android, iOS, and Web using ML Kit Document Scanner API and VisionKit.
 
 [![pub package](https://img.shields.io/pub/v/flutter_doc_scanner.svg)](https://pub.dev/packages/flutter_doc_scanner)
 
@@ -35,13 +35,13 @@ To use this plugin, add `flutter_doc_scanner` as a dependency in your `pubspec.y
 dependencies:
   flutter:
     sdk: flutter
-  flutter_doc_scanner: ^0.0.7
+  flutter_doc_scanner: ^0.0.10
 
 ```
 Got it! Here's a more detailed explanation:
 
 ## Project Setup
-Follow the steps below to set up your Flutter project on Android and iOS.
+Follow the steps below to set up your Flutter project on Android, iOS, and Web.
 
 ### Android
 
@@ -76,7 +76,7 @@ platform :ios, '13.0'
 ```ruby
   <key>NSCameraUsageDescription</key>
   <string>Camera Permission Description</string>
-  ```
+```
 
 2. The `permission_handler` dependency used by `flutter_doc_scanner` uses macros to control whether a permission is enabled. To enable camera permission, add the following to your `Podfile` file. This step ensures that your app can request and handle camera permissions on iOS devices:
 
@@ -108,21 +108,26 @@ platform :ios, '13.0'
    end
    ```
 
-## Usage
+### Web
 
-```ruby
-import 'package:flutter_doc_scanner/flutter_doc_scanner.dart';
+The `flutter_doc_scanner` also supports document scanning for web using `dart:html`.
 
-// Use the `FlutterDocScanner` class to start the document scanning process.
-dynamic scannedDocuments;
-try {
-  scannedDocuments = await FlutterDocScanner().getScanDocuments() ??
-      'Unknown platform documents';
-} on PlatformException {
-  scannedDocuments = 'Failed to get scanned documents.';
-}
-print(scannedDocuments.toString());
+#### Usage on Web
+To use this plugin for web, you can use the following function:
+
+```dart
+scannedDocuments = await FlutterDocScanner().getScanDocumentsWeb(
+    context,
+    appBarTitle: "Crop Document",
+    captureButtonText: "Capture Image",
+    cropButtonText: "Crop & Save",
+    cropPdfButtonText: "Crop & PDF",
+    width: 400,
+    height: 400,
+);
 ```
+
+This web implementation allows users to capture, crop, and convert images to PDFs directly from the browser.
 
 ## Issues and Feedback
 
