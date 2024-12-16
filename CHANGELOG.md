@@ -1,3 +1,7 @@
+## 0.0.11
+- Temporarily removed web support.
+- Fixed minor bugs.
+
 ## 0.0.10
 - Added Web Support.
 
