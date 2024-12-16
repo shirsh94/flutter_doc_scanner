@@ -35,7 +35,7 @@ To use this plugin, add `flutter_doc_scanner` as a dependency in your `pubspec.y
 dependencies:
   flutter:
     sdk: flutter
-  flutter_doc_scanner: ^0.0.11
+  flutter_doc_scanner: ^0.0.12
 
 ```
 Got it! Here's a more detailed explanation:
@@ -109,11 +109,7 @@ platform :ios, '13.0'
    ```
 
 ### Web
-
 Currently, we have removed web support for this library. For document scanning on the web, you can use the following library: flutter_doc_scanner_web.
-```
-
-This web implementation allows users to capture, crop, and convert images to PDFs directly from the browser.
 
 ## Issues and Feedback
 
