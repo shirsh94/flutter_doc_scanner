@@ -26,6 +26,7 @@ Check out the `example` directory for a sample Flutter app using `flutter_doc_sc
 - Flexible functionality allows users to crop scanned documents, apply filters, remove fingers, remove stains and other blemishes.
 - On-device processing helps preserve privacy.
 - Support for sending digitized files in PDF and JPEG formats back to your app.
+- Ability to set a scan page limit.
 
 ## Installation
 
@@ -35,7 +36,7 @@ To use this plugin, add `flutter_doc_scanner` as a dependency in your `pubspec.y
 dependencies:
   flutter:
     sdk: flutter
-  flutter_doc_scanner: ^0.0.12
+  flutter_doc_scanner: ^0.0.13
 
 ```
 Got it! Here's a more detailed explanation:
