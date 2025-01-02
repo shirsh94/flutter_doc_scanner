@@ -23,7 +23,7 @@ class _MyAppState extends State<MyApp> {
   Future<void> scanDocument() async {
     dynamic scannedDocuments;
     try {
-      scannedDocuments = await FlutterDocScanner().getScanDocuments() ??
+      scannedDocuments = await FlutterDocScanner().getScanDocuments(5) ??
           'Unknown platform documents';
     } on PlatformException {
       scannedDocuments = 'Failed to get scanned documents.';
@@ -38,7 +38,7 @@ class _MyAppState extends State<MyApp> {
   Future<void> scanDocumentUri() async {
     dynamic scannedDocuments;
     try {
-      scannedDocuments = await FlutterDocScanner().getScanDocumentsUri() ??
+      scannedDocuments = await FlutterDocScanner().getScanDocumentsUri(5) ??
           'Unknown platform documents';
     } on PlatformException {
       scannedDocuments = 'Failed to get scanned documents.';
