@@ -1,4 +1,7 @@
 ## 0.0.13
+- Default page limit set.
+
+## 0.0.13
 - Added functionality to set a scan page limit.
 
 ## 0.0.12
