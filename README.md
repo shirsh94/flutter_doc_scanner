@@ -36,10 +36,27 @@ To use this plugin, add `flutter_doc_scanner` as a dependency in your `pubspec.y
 dependencies:
   flutter:
     sdk: flutter
-  flutter_doc_scanner: ^0.0.13
+  flutter_doc_scanner: ^0.0.14
 
 ```
 Got it! Here's a more detailed explanation:
+
+## Usage
+
+Use the following function for document scanning on Android and iOS:
+
+```dart
+  Future<void> scanDocument() async {
+  dynamic scannedDocuments;
+  try {
+    scannedDocuments = await FlutterDocScanner().getScanDocuments(page: 3) ??
+        'Unknown platform documents';
+  } on PlatformException {
+    scannedDocuments = 'Failed to get scanned documents.';
+  }
+  print(scannedDocuments.toString());
+}
+```
 
 ## Project Setup
 Follow the steps below to set up your Flutter project on Android, iOS, and Web.
@@ -110,7 +127,7 @@ platform :ios, '13.0'
    ```
 
 ### Web
-Currently, we have removed web support for this library. For document scanning on the web, you can use the following library: flutter_doc_scanner_web.
+Currently, we have removed web support for this library. For document scanning on the web, you can use the following library: [flutter_doc_scanner_web](https://pub.dev/packages/flutter_doc_scanner_web).
 
 ## Issues and Feedback
 
