@@ -6,13 +6,13 @@ class FlutterDocScanner {
     return FlutterDocScannerPlatform.instance.getPlatformVersion();
   }
 
-  Future<dynamic> getScanDocuments() {
-    return FlutterDocScannerPlatform.instance.getScanDocuments();
+  Future<dynamic> getScanDocuments([int page = 5]) {
+    return FlutterDocScannerPlatform.instance.getScanDocuments(page);
   }
 
-  Future<dynamic> getScanDocumentsUri() {
+  Future<dynamic> getScanDocumentsUri([int page = 5]) {
     if (defaultTargetPlatform == TargetPlatform.android) {
-      return FlutterDocScannerPlatform.instance.getScanDocumentsUri();
+      return FlutterDocScannerPlatform.instance.getScanDocumentsUri(page);
     } else {
       return Future.error(
           "Currently, this feature is supported only on Android Platform");

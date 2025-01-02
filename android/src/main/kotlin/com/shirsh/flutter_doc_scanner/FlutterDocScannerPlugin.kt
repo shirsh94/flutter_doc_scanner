@@ -52,26 +52,27 @@ class FlutterDocScannerPlugin : MethodCallHandler, ActivityResultListener,
         if (call.method == "getPlatformVersion") {
             result.success("Android ${android.os.Build.VERSION.RELEASE}")
         } else if (call.method == "getScanDocuments") {
+            val arguments = call.arguments as? Map<*, *>
+            val page = (arguments?.get("page") as? Int)?.coerceAtLeast(1) ?: 5
             resultChannel = result
-            startDocumentScan()
+            startDocumentScan(page)
         } else if (call.method == "getScanDocumentsUri") {
+            val arguments = call.arguments as? Map<*, *>
+            val page = (arguments?.get("page") as? Int)?.coerceAtLeast(1) ?: 5
             resultChannel = result
-            startDocumentScanUri()
+            startDocumentScanUri(page)
         } else {
             result.notImplemented()
         }
     }
 
-    private fun startDocumentScan() {
-        val options = GmsDocumentScannerOptions.Builder()
-            .setGalleryImportAllowed(true)
-            .setPageLimit(9)
-            .setResultFormats(
-                GmsDocumentScannerOptions.RESULT_FORMAT_JPEG,
-                GmsDocumentScannerOptions.RESULT_FORMAT_PDF
-            )
-            .setScannerMode(GmsDocumentScannerOptions.SCANNER_MODE_FULL)
-            .build()
+    private fun startDocumentScan(page: Int = 5) {
+        val options =
+            GmsDocumentScannerOptions.Builder().setGalleryImportAllowed(true).setPageLimit(page)
+                .setResultFormats(
+                    GmsDocumentScannerOptions.RESULT_FORMAT_JPEG,
+                    GmsDocumentScannerOptions.RESULT_FORMAT_PDF
+                ).setScannerMode(GmsDocumentScannerOptions.SCANNER_MODE_FULL).build()
         val scanner = GmsDocumentScanning.getClient(options)
         val task: Task<IntentSender>? = activity?.let { scanner.getStartScanIntent(it) }
         task?.addOnSuccessListener { intentSender ->
@@ -96,16 +97,13 @@ class FlutterDocScannerPlugin : MethodCallHandler, ActivityResultListener,
         }
     }
 
-    private fun startDocumentScanUri() {
-        val options = GmsDocumentScannerOptions.Builder()
-            .setGalleryImportAllowed(true)
-            .setPageLimit(9)
-            .setResultFormats(
-                GmsDocumentScannerOptions.RESULT_FORMAT_JPEG,
-                GmsDocumentScannerOptions.RESULT_FORMAT_PDF
-            )
-            .setScannerMode(GmsDocumentScannerOptions.SCANNER_MODE_FULL)
-            .build()
+    private fun startDocumentScanUri(page: Int = 5) {
+        val options =
+            GmsDocumentScannerOptions.Builder().setGalleryImportAllowed(true).setPageLimit(page)
+                .setResultFormats(
+                    GmsDocumentScannerOptions.RESULT_FORMAT_JPEG,
+                    GmsDocumentScannerOptions.RESULT_FORMAT_PDF
+                ).setScannerMode(GmsDocumentScannerOptions.SCANNER_MODE_FULL).build()
         val scanner = GmsDocumentScanning.getClient(options)
         val task: Task<IntentSender>? = activity?.let { scanner.getStartScanIntent(it) }
         task?.addOnSuccessListener { intentSender ->
