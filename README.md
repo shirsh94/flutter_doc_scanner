@@ -27,6 +27,8 @@ Check out the `example` directory for a sample Flutter app using `flutter_doc_sc
 - On-device processing helps preserve privacy.
 - Support for sending digitized files in PDF and JPEG formats back to your app.
 - Ability to set a scan page limit.
+- Support for image(png,jpeg) format and PDF has been added through various methods.
+
 
 ## Installation
 
@@ -36,7 +38,7 @@ To use this plugin, add `flutter_doc_scanner` as a dependency in your `pubspec.y
 dependencies:
   flutter:
     sdk: flutter
-  flutter_doc_scanner: ^0.0.14
+  flutter_doc_scanner: ^0.0.15
 
 ```
 Got it! Here's a more detailed explanation:
@@ -47,6 +49,7 @@ Use the following function for document scanning on Android and iOS:
 
 ```dart
   Future<void> scanDocument() async {
+  //by default way they fetch pdf for android and png for iOS
   dynamic scannedDocuments;
   try {
     scannedDocuments = await FlutterDocScanner().getScanDocuments(page: 3) ??
@@ -57,6 +60,8 @@ Use the following function for document scanning on Android and iOS:
   print(scannedDocuments.toString());
 }
 ```
+**Note-: If you want to obtain only a PDF scanned document, call getScannedDocumentAsPdf(). Similarly, if you want to get a scanned document in image format, use getScannedDocumentAsImages().**
+
 
 ## Project Setup
 Follow the steps below to set up your Flutter project on Android, iOS, and Web.

@@ -35,12 +35,45 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
+  Future<void> scanDocumentAsImages() async {
+    dynamic scannedDocuments;
+    try {
+      scannedDocuments =
+          await FlutterDocScanner().getScannedDocumentAsImages(page: 4) ??
+              'Unknown platform documents';
+    } on PlatformException {
+      scannedDocuments = 'Failed to get scanned documents.';
+    }
+    print(scannedDocuments.toString());
+    if (!mounted) return;
+    setState(() {
+      _scannedDocuments = scannedDocuments;
+    });
+  }
+
+  Future<void> scanDocumentAsPdf() async {
+    dynamic scannedDocuments;
+    try {
+      scannedDocuments =
+          await FlutterDocScanner().getScannedDocumentAsPdf(page: 4) ??
+              'Unknown platform documents';
+    } on PlatformException {
+      scannedDocuments = 'Failed to get scanned documents.';
+    }
+    print(scannedDocuments.toString());
+    if (!mounted) return;
+    setState(() {
+      _scannedDocuments = scannedDocuments;
+    });
+  }
+
   Future<void> scanDocumentUri() async {
     //This Feature only supported for Android.
     dynamic scannedDocuments;
     try {
-      scannedDocuments = await FlutterDocScanner().getScanDocumentsUri(page: 4) ??
-          'Unknown platform documents';
+      scannedDocuments =
+          await FlutterDocScanner().getScanDocumentsUri(page: 4) ??
+              'Unknown platform documents';
     } on PlatformException {
       scannedDocuments = 'Failed to get scanned documents.';
     }
@@ -83,6 +116,24 @@ class _MyAppState extends State<MyApp> {
                     scanDocument();
                   },
                   child: const Text("Scan Documents"),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                child: ElevatedButton(
+                  onPressed: () {
+                    scanDocument();
+                  },
+                  child: const Text("Scan Documents As Images"),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                child: ElevatedButton(
+                  onPressed: () {
+                    scanDocument();
+                  },
+                  child: const Text("Scan Documents As PDF"),
                 ),
               ),
               Padding(

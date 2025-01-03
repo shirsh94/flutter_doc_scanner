@@ -10,6 +10,14 @@ class FlutterDocScanner {
     return FlutterDocScannerPlatform.instance.getScanDocuments(page);
   }
 
+  Future<dynamic> getScannedDocumentAsImages({int page = 4}) {
+    return FlutterDocScannerPlatform.instance.getScannedDocumentAsImages(page);
+  }
+
+  Future<dynamic> getScannedDocumentAsPdf({int page = 4}) {
+    return FlutterDocScannerPlatform.instance.getScannedDocumentAsPdf(page);
+  }
+
   Future<dynamic> getScanDocumentsUri({int page = 4}) {
     if (defaultTargetPlatform == TargetPlatform.android) {
       return FlutterDocScannerPlatform.instance.getScanDocumentsUri(page);

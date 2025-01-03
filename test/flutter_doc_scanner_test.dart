@@ -14,6 +14,12 @@ class MockFlutterDocScannerPlatform
   Future<String?> getScanDocuments([int page = 5]) => Future.value();
 
   @override
+  Future<String?> getScannedDocumentAsImages([int page = 5]) => Future.value();
+
+  @override
+  Future<String?> getScannedDocumentAsPdf([int page = 5]) => Future.value();
+
+  @override
   Future<String?> getScanDocumentsUri([int page = 5]) => Future.value();
 }
 
