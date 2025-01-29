@@ -204,54 +204,73 @@ class FlutterDocScannerPlugin : MethodCallHandler, ActivityResultListener,
 
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?): Boolean {
-        if (requestCode == REQUEST_CODE_SCAN && resultCode == Activity.RESULT_OK) {
-            val scanningResult = GmsDocumentScanningResult.fromActivityResultIntent(data)
-            scanningResult?.getPdf()?.let { pdf ->
-                val pdfUri = pdf.getUri()
-                val pageCount = pdf.getPageCount()
-                resultChannel.success(
-                    mapOf(
-                        "pdfUri" to pdfUri.toString(),
-                        "pageCount" to pageCount,
-                    )
-                )
+        when (requestCode) {
+            REQUEST_CODE_SCAN -> {
+                if (resultCode == Activity.RESULT_OK) {
+                    val scanningResult = GmsDocumentScanningResult.fromActivityResultIntent(data)
+                    scanningResult?.getPdf()?.let { pdf ->
+                        val pdfUri = pdf.getUri()
+                        val pageCount = pdf.getPageCount()
+                        resultChannel.success(
+                            mapOf(
+                                "pdfUri" to pdfUri.toString(),
+                                "pageCount" to pageCount,
+                            )
+                        )
+                    } ?: resultChannel.error("SCAN_FAILED", "No PDF result returned", null)
+                } else if (resultCode == Activity.RESULT_CANCELED) {
+                    resultChannel.success(null)
+                } else {
+                    resultChannel.error("SCAN_FAILED", "Failed to start scanning", null)
+                }
             }
-        } else if (requestCode == REQUEST_CODE_SCAN_IMAGES && resultCode == Activity.RESULT_OK) {
-            val scanningResult = GmsDocumentScanningResult.fromActivityResultIntent(data)
-            scanningResult?.getPages()?.let { pages ->
-                resultChannel.success(
-                    mapOf(
-                        "Uri" to pages.toString(),
-                        "Count" to pages.size,
-                    )
-                )
-                return@let true
+            REQUEST_CODE_SCAN_IMAGES -> {
+                if (resultCode == Activity.RESULT_OK) {
+                    val scanningResult = GmsDocumentScanningResult.fromActivityResultIntent(data)
+                    scanningResult?.getPages()?.let { pages ->
+                        resultChannel.success(
+                            mapOf(
+                                "Uri" to pages.toString(),
+                                "Count" to pages.size,
+                            )
+                        )
+                    } ?: resultChannel.error("SCAN_FAILED", "No image results returned", null)
+                } else if (resultCode == Activity.RESULT_CANCELED) {
+                    resultChannel.success(null)
+                }
             }
-        } else if (requestCode == REQUEST_CODE_SCAN_PDF && resultCode == Activity.RESULT_OK) {
-            val scanningResult = GmsDocumentScanningResult.fromActivityResultIntent(data)
-            scanningResult?.getPdf()?.let { pdf ->
-                val pdfUri = pdf.getUri()
-                val pageCount = pdf.getPageCount()
-                resultChannel.success(
-                    mapOf(
-                        "pdfUri" to pdfUri.toString(),
-                        "pageCount" to pageCount,
-                    )
-                )
+            REQUEST_CODE_SCAN_PDF -> {
+                if (resultCode == Activity.RESULT_OK) {
+                    val scanningResult = GmsDocumentScanningResult.fromActivityResultIntent(data)
+                    scanningResult?.getPdf()?.let { pdf ->
+                        val pdfUri = pdf.getUri()
+                        val pageCount = pdf.getPageCount()
+                        resultChannel.success(
+                            mapOf(
+                                "pdfUri" to pdfUri.toString(),
+                                "pageCount" to pageCount,
+                            )
+                        )
+                    } ?: resultChannel.error("SCAN_FAILED", "No PDF result returned", null)
+                } else if (resultCode == Activity.RESULT_CANCELED) {
+                    resultChannel.success(null)
+                }
             }
-        } else if (requestCode == REQUEST_CODE_SCAN_URI && resultCode == Activity.RESULT_OK) {
-            val scanningResult = GmsDocumentScanningResult.fromActivityResultIntent(data)
-            scanningResult?.getPages()?.let { pages ->
-                resultChannel.success(
-                    mapOf(
-                        "Uri" to pages.toString(),
-                        "Count" to pages.size,
-                    )
-                )
-                return@let true
+            REQUEST_CODE_SCAN_URI -> {
+                if (resultCode == Activity.RESULT_OK) {
+                    val scanningResult = GmsDocumentScanningResult.fromActivityResultIntent(data)
+                    scanningResult?.getPages()?.let { pages ->
+                        resultChannel.success(
+                            mapOf(
+                                "Uri" to pages.toString(),
+                                "Count" to pages.size,
+                            )
+                        )
+                    } ?: resultChannel.error("SCAN_FAILED", "No URI results returned", null)
+                } else if (resultCode == Activity.RESULT_CANCELED) {
+                    resultChannel.success(null)
+                }
             }
-        } else if (requestCode == REQUEST_CODE_SCAN || requestCode == REQUEST_CODE_SCAN_URI) {
-            resultChannel.error("SCAN_FAILED", "Failed to start scanning", null)
         }
         return false
     }
