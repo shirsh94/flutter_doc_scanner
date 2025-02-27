@@ -31,7 +31,6 @@ import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
 import io.flutter.plugin.common.PluginRegistry.ActivityResultListener
-import io.flutter.plugin.common.PluginRegistry.Registrar
 
 class FlutterDocScannerPlugin : MethodCallHandler, ActivityResultListener,
     FlutterPlugin, ActivityAware {
@@ -295,7 +294,6 @@ class FlutterDocScannerPlugin : MethodCallHandler, ActivityResultListener,
         messenger: BinaryMessenger,
         applicationContext: Application?,
         activity: Activity,
-        registrar: Registrar?,
         activityBinding: ActivityPluginBinding?
     ) {
         this.activity = activity
@@ -311,7 +309,6 @@ class FlutterDocScannerPlugin : MethodCallHandler, ActivityResultListener,
             pluginBinding!!.binaryMessenger,
             pluginBinding!!.applicationContext as Application,
             activityBinding!!.activity,
-            null,
             activityBinding
         )
     }
