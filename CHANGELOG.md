@@ -1,3 +1,6 @@
+## 0.0.16
+- Added support for image format and PDF in different methods.
+
 ## 0.0.15
 - Added support for image format and PDF in different methods.
 
