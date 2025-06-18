@@ -6,173 +6,134 @@ import PDFKit
 
 @available(iOS 13.0, *)
 public class SwiftFlutterDocScannerPlugin: NSObject, FlutterPlugin, VNDocumentCameraViewControllerDelegate {
-   var resultChannel: FlutterResult?
-   var presentingController: VNDocumentCameraViewController?
-   var currentMethod: String?
 
-   public static func register(with registrar: FlutterPluginRegistrar) {
-       let channel = FlutterMethodChannel(name: "flutter_doc_scanner", binaryMessenger: registrar.messenger())
-       let instance = SwiftFlutterDocScannerPlugin()
-       registrar.addMethodCallDelegate(instance, channel: channel)
-   }
+    var resultChannel: FlutterResult?
+    var currentMethod: String?
+    var presentingController: UIViewController?
 
-   public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
-       if call.method == "getScanDocuments" {
-           let presentedVC: UIViewController? = UIApplication.shared.keyWindow?.rootViewController
-           self.resultChannel = result
-           self.currentMethod = call.method
-           self.presentingController = VNDocumentCameraViewController()
-           self.presentingController!.delegate = self
-           presentedVC?.present(self.presentingController!, animated: true)
-       } else if call.method == "getScannedDocumentAsImages" {
-           let presentedVC: UIViewController? = UIApplication.shared.keyWindow?.rootViewController
-           self.resultChannel = result
-           self.currentMethod = call.method
-           self.presentingController = VNDocumentCameraViewController()
-           self.presentingController!.delegate = self
-           presentedVC?.present(self.presentingController!, animated: true)
-       } else if call.method == "getScannedDocumentAsPdf" {
-           let presentedVC: UIViewController? = UIApplication.shared.keyWindow?.rootViewController
-           self.resultChannel = result
-           self.currentMethod = call.method
-           self.presentingController = VNDocumentCameraViewController()
-           self.presentingController!.delegate = self
-           presentedVC?.present(self.presentingController!, animated: true)
-       } else {
-           result(FlutterMethodNotImplemented)
-           return
-       }
-   }
+    public static func register(with registrar: FlutterPluginRegistrar) {
+        let channel = FlutterMethodChannel(name: "flutter_doc_scanner", binaryMessenger: registrar.messenger())
+        let instance = SwiftFlutterDocScannerPlugin()
+        registrar.addMethodCallDelegate(instance, channel: channel)
+    }
 
-   func getDocumentsDirectory() -> URL {
-       let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
-       let documentsDirectory = paths[0]
-       return documentsDirectory
-   }
+    public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+        self.resultChannel = result
+        self.currentMethod = call.method
 
-   public func documentCameraViewController(_ controller: VNDocumentCameraViewController, didFinishWith scan: VNDocumentCameraScan) {
-       if currentMethod == "getScanDocuments" {
-           saveScannedImages(scan: scan) // Uses existing logic
-       } else if currentMethod == "getScannedDocumentAsImages" {
-           saveScannedImages(scan: scan)
-       } else if currentMethod == "getScannedDocumentAsPdf" {
-           saveScannedPdf(scan: scan)
-       }
-       presentingController?.dismiss(animated: true)
-   }
+        guard let rootVC = UIApplication.shared.connectedScenes
+                .compactMap({ ($0 as? UIWindowScene)?.keyWindow })
+                .first?.rootViewController else {
+            result(FlutterError(code: "NO_UI", message: "Unable to access root view controller", details: nil))
+            return
+        }
 
-   private func saveScannedImages(scan: VNDocumentCameraScan) {
-       let tempDirPath = getDocumentsDirectory()
-       let currentDateTime = Date()
-       let df = DateFormatter()
-       df.dateFormat = "yyyyMMdd-HHmmss"
-       let formattedDate = df.string(from: currentDateTime)
-       var filenames: [String] = []
-       for i in 0 ..< scan.pageCount {
-           let page = scan.imageOfPage(at: i)
-           let url = tempDirPath.appendingPathComponent(formattedDate + "-\(i).png")
-           try? page.pngData()?.write(to: url)
-           filenames.append(url.path)
-       }
-       resultChannel?(filenames)
-   }
+        if call.method == "manualScan" {
+            let manualVC = ManualDocumentScannerViewController()
+            manualVC.modalPresentationStyle = .fullScreen
 
-   private func saveScannedPdf(scan: VNDocumentCameraScan) {
-       let tempDirPath = getDocumentsDirectory()
-       let currentDateTime = Date()
-       let df = DateFormatter()
-       df.dateFormat = "yyyyMMdd-HHmmss"
-       let formattedDate = df.string(from: currentDateTime)
-       let pdfFilePath = tempDirPath.appendingPathComponent("\(formattedDate).pdf")
+            manualVC.onCaptureComplete = { images in
+                let tempDir = FileManager.default.temporaryDirectory
+                var paths: [String] = []
 
-       let pdfDocument = PDFDocument()
-       for i in 0 ..< scan.pageCount {
-           let pageImage = scan.imageOfPage(at: i)
-           if let pdfPage = PDFPage(image: pageImage) {
-               pdfDocument.insert(pdfPage, at: pdfDocument.pageCount)
-           }
-       }
+                for (i, image) in images.enumerated() {
+                    if let data = image.jpegData(compressionQuality: 0.8) {
+                        let url = tempDir.appendingPathComponent("scan_\(UUID().uuidString)_\(i).jpg")
+                        try? data.write(to: url)
+                        paths.append(url.path)
+                    }
+                }
 
-       do {
-           try pdfDocument.write(to: pdfFilePath)
-           resultChannel?(pdfFilePath.path)
-       } catch {
-           resultChannel?(FlutterError(code: "PDF_CREATION_ERROR", message: "Failed to create PDF", details: error.localizedDescription))
-       }
-   }
+                if paths.isEmpty {
+                    result(FlutterError(code: "CAPTURE_ERROR", message: "No images captured", details: nil))
+                } else {
+                    result(paths)
+                }
+            }
 
-   public func documentCameraViewControllerDidCancel(_ controller: VNDocumentCameraViewController) {
-       resultChannel?(nil)
-       presentingController?.dismiss(animated: true)
-   }
+            rootVC.present(manualVC, animated: true)
 
-   public func documentCameraViewController(_ controller: VNDocumentCameraViewController, didFailWithError error: Error) {
-       resultChannel?(FlutterError(code: "SCAN_ERROR", message: "Failed to scan documents", details: error.localizedDescription))
-       presentingController?.dismiss(animated: true)
-   }
+        } else if ["getScanDocuments", "getScannedDocumentAsImages", "getScannedDocumentAsPdf"].contains(call.method) {
+            let docScanner = VNDocumentCameraViewController()
+            docScanner.delegate = self
+            self.presentingController = rootVC
+            rootVC.present(docScanner, animated: true)
+
+        } else {
+            result(FlutterMethodNotImplemented)
+        }
+    }
+
+    private func getDocumentsDirectory() -> URL {
+        let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
+        return paths[0]
+    }
+
+    // MARK: - VNDocumentCameraViewControllerDelegate
+
+    public func documentCameraViewController(_ controller: VNDocumentCameraViewController, didFinishWith scan: VNDocumentCameraScan) {
+        switch currentMethod {
+        case "getScanDocuments", "getScannedDocumentAsImages":
+            saveScannedImages(scan: scan)
+        case "getScannedDocumentAsPdf":
+            saveScannedPdf(scan: scan)
+        default:
+            resultChannel?(FlutterError(code: "INVALID_METHOD", message: "Unsupported scan method", details: nil))
+        }
+        presentingController?.dismiss(animated: true)
+    }
+
+    public func documentCameraViewControllerDidCancel(_ controller: VNDocumentCameraViewController) {
+        resultChannel?(nil)
+        presentingController?.dismiss(animated: true)
+    }
+
+    public func documentCameraViewController(_ controller: VNDocumentCameraViewController, didFailWithError error: Error) {
+        resultChannel?(FlutterError(code: "SCAN_ERROR", message: "Scan failed", details: error.localizedDescription))
+        presentingController?.dismiss(animated: true)
+    }
+
+    // MARK: - Save Functions
+
+    private func saveScannedImages(scan: VNDocumentCameraScan) {
+        let tempDirPath = getDocumentsDirectory()
+        let df = DateFormatter()
+        df.dateFormat = "yyyyMMdd-HHmmss"
+        let formattedDate = df.string(from: Date())
+
+        var filenames: [String] = []
+
+        for i in 0..<scan.pageCount {
+            let page = scan.imageOfPage(at: i)
+            let url = tempDirPath.appendingPathComponent("\(formattedDate)-\(i).png")
+            try? page.pngData()?.write(to: url)
+            filenames.append(url.path)
+        }
+
+        resultChannel?(filenames)
+    }
+
+    private func saveScannedPdf(scan: VNDocumentCameraScan) {
+        let tempDirPath = getDocumentsDirectory()
+        let df = DateFormatter()
+        df.dateFormat = "yyyyMMdd-HHmmss"
+        let formattedDate = df.string(from: Date())
+
+        let pdfFilePath = tempDirPath.appendingPathComponent("\(formattedDate).pdf")
+        let pdfDocument = PDFDocument()
+
+        for i in 0..<scan.pageCount {
+            let image = scan.imageOfPage(at: i)
+            if let pdfPage = PDFPage(image: image) {
+                pdfDocument.insert(pdfPage, at: pdfDocument.pageCount)
+            }
+        }
+
+        do {
+            try pdfDocument.write(to: pdfFilePath)
+            resultChannel?(pdfFilePath.path)
+        } catch {
+            resultChannel?(FlutterError(code: "PDF_CREATION_ERROR", message: "Could not create PDF", details: error.localizedDescription))
+        }
+    }
 }
-
-
-// import Flutter
-// import UIKit
-// import Vision
-// import VisionKit
-//
-// @available(iOS 13.0, *)
-// public class SwiftFlutterDocScannerPlugin: NSObject, FlutterPlugin, VNDocumentCameraViewControllerDelegate {
-//    var resultChannel :FlutterResult?
-//    var presentingController: VNDocumentCameraViewController?
-//
-//   public static func register(with registrar: FlutterPluginRegistrar) {
-//     let channel = FlutterMethodChannel(name: "flutter_doc_scanner", binaryMessenger: registrar.messenger())
-//     let instance = SwiftFlutterDocScannerPlugin()
-//     registrar.addMethodCallDelegate(instance, channel: channel)
-//   }
-//
-//   public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
-//     if call.method == "getScanDocuments" {
-//             let presentedVC: UIViewController? = UIApplication.shared.keyWindow?.rootViewController
-//             self.resultChannel = result
-//             self.presentingController = VNDocumentCameraViewController()
-//             self.presentingController!.delegate = self
-//             presentedVC?.present(self.presentingController!, animated: true)
-//            } else {
-//             result(FlutterMethodNotImplemented)
-//             return
-//        }
-//   }
-//
-//
-//     func getDocumentsDirectory() -> URL {
-//         let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
-//         let documentsDirectory = paths[0]
-//         return documentsDirectory
-//     }
-//
-//     public func documentCameraViewController(_ controller: VNDocumentCameraViewController, didFinishWith scan: VNDocumentCameraScan) {
-//         let tempDirPath = self.getDocumentsDirectory()
-//         let currentDateTime = Date()
-//         let df = DateFormatter()
-//         df.dateFormat = "yyyyMMdd-HHmmss"
-//         let formattedDate = df.string(from: currentDateTime)
-//         var filenames: [String] = []
-//         for i in 0 ... scan.pageCount - 1 {
-//             let page = scan.imageOfPage(at: i)
-//             let url = tempDirPath.appendingPathComponent(formattedDate + "-\(i).png")
-//             try? page.pngData()?.write(to: url)
-//             filenames.append(url.path)
-//         }
-//         resultChannel?(filenames)
-//         presentingController?.dismiss(animated: true)
-//     }
-//
-//     public func documentCameraViewControllerDidCancel(_ controller: VNDocumentCameraViewController) {
-//         resultChannel?(nil)
-//         presentingController?.dismiss(animated: true)
-//     }
-//
-//     public func documentCameraViewController(_ controller: VNDocumentCameraViewController, didFailWithError error: Error) {
-//         resultChannel?(nil)
-//         presentingController?.dismiss(animated: true)
-//     }
-// }

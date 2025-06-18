@@ -33,6 +33,11 @@ class MethodChannelFlutterDocScanner extends FlutterDocScannerPlatform {
     );
     return data;
   }
+  @override
+  Future<dynamic> manualScan() async {
+    final data = await MethodChannel('flutter_doc_scanner').invokeMethod('manualScan');
+    return data;
+  }
 
   @override
   Future<dynamic> getScannedDocumentAsPdf([int page = 1]) async {

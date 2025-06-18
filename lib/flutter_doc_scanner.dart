@@ -13,6 +13,9 @@ class FlutterDocScanner {
   Future<dynamic> getScannedDocumentAsImages({int page = 4}) {
     return FlutterDocScannerPlatform.instance.getScannedDocumentAsImages(page);
   }
+  Future<dynamic> manualScan( ) {
+    return FlutterDocScannerPlatform.instance.manualScan();
+  }
 
   Future<dynamic> getScannedDocumentAsPdf({int page = 4}) {
     return FlutterDocScannerPlatform.instance.getScannedDocumentAsPdf(page);
