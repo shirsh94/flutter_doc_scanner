@@ -122,7 +122,7 @@ class _MyAppState extends State<MyApp> {
                 padding: const EdgeInsets.symmetric(vertical: 8.0),
                 child: ElevatedButton(
                   onPressed: () {
-                    scanDocument();
+                    scanDocumentAsImages();
                   },
                   child: const Text("Scan Documents As Images"),
                 ),
@@ -131,7 +131,7 @@ class _MyAppState extends State<MyApp> {
                 padding: const EdgeInsets.symmetric(vertical: 8.0),
                 child: ElevatedButton(
                   onPressed: () {
-                    scanDocument();
+                    scanDocumentAsPdf();
                   },
                   child: const Text("Scan Documents As PDF"),
                 ),

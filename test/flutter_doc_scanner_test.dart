@@ -11,16 +11,17 @@ class MockFlutterDocScannerPlatform
   Future<String?> getPlatformVersion() => Future.value('42');
 
   @override
-  Future<String?> getScanDocuments([int page = 5]) => Future.value();
+  Future<String?> getScanDocuments([int page = 4]) => Future.value();
 
   @override
-  Future<String?> getScannedDocumentAsImages([int page = 5]) => Future.value();
+  Future<String?> getScannedDocumentAsImages([int page = 4]) =>
+      Future.value();
 
   @override
-  Future<String?> getScannedDocumentAsPdf([int page = 5]) => Future.value();
+  Future<String?> getScannedDocumentAsPdf([int page = 4]) => Future.value();
 
   @override
-  Future<String?> getScanDocumentsUri([int page = 5]) => Future.value();
+  Future<String?> getScanDocumentsUri([int page = 4]) => Future.value();
 }
 
 void main() {
