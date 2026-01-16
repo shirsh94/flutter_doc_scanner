@@ -1,5 +1,10 @@
+## 0.0.17
+- Updated ML Kit Document Scanner to v16.0.0 with safer scanning, better errors, and URI payload support.
+- Modernized Android stack (AGP 8.6, Kotlin 2.0.21, Gradle 8.7, Java/Kotlin 17, minSdk 21).
+- Synced Flutter defaults/tests, improved platform errors, added web stubs, and fixed example app.
+
 ## 0.0.16
-- Added support for image format and PDF in different methods.
+- Migrated to Flutter 3.29 and fixed error handling in onActivityResult.
 
 ## 0.0.15
 - Added support for image format and PDF in different methods.
