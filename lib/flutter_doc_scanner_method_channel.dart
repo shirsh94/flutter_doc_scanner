@@ -17,7 +17,7 @@ class MethodChannelFlutterDocScanner extends FlutterDocScannerPlatform {
   }
 
   @override
-  Future<dynamic> getScanDocuments([int page = 1]) async {
+  Future<dynamic> getScanDocuments([int page = 4]) async {
     final data = await methodChannel.invokeMethod<dynamic>(
       'getScanDocuments',
       {'page': page},
@@ -26,7 +26,7 @@ class MethodChannelFlutterDocScanner extends FlutterDocScannerPlatform {
   }
 
   @override
-  Future<dynamic> getScannedDocumentAsImages([int page = 1]) async {
+  Future<dynamic> getScannedDocumentAsImages([int page = 4]) async {
     final data = await methodChannel.invokeMethod<dynamic>(
       'getScannedDocumentAsImages',
       {'page': page},
@@ -35,7 +35,7 @@ class MethodChannelFlutterDocScanner extends FlutterDocScannerPlatform {
   }
 
   @override
-  Future<dynamic> getScannedDocumentAsPdf([int page = 1]) async {
+  Future<dynamic> getScannedDocumentAsPdf([int page = 4]) async {
     final data = await methodChannel.invokeMethod<dynamic>(
       'getScannedDocumentAsPdf',
       {'page': page},
@@ -44,7 +44,7 @@ class MethodChannelFlutterDocScanner extends FlutterDocScannerPlatform {
   }
 
   @override
-  Future<dynamic> getScanDocumentsUri([int page = 1]) async {
+  Future<dynamic> getScanDocumentsUri([int page = 4]) async {
     final data = await methodChannel.invokeMethod<dynamic>(
       'getScanDocumentsUri',
       {'page': page},

@@ -62,6 +62,10 @@ Use the following function for document scanning on Android and iOS:
 ```
 **Note-: If you want to obtain only a PDF scanned document, call getScannedDocumentAsPdf(). Similarly, if you want to get a scanned document in image format, use getScannedDocumentAsImages().**
 
+### Android result payloads
+- `getScanDocuments` / `getScannedDocumentAsPdf`: returns a map with `pdfUri` and `pageCount`.
+- `getScannedDocumentAsImages` / `getScanDocumentsUri`: returns a map with `images` (list of page URIs) and `count` (also exposed via legacy `Uri` / `Count` keys for backwards compatibility).
+
 
 ## Project Setup
 Follow the steps below to set up your Flutter project on Android, iOS, and Web.
