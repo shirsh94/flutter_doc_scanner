@@ -1,3 +1,7 @@
+## 0.0.18
+-Added typed models, structured errors, image format/quality control (iOS), validation, permission checks, tests, and dependency cleanup.
+-Fixed Android 15 crashes, lifecycle/thread issues, memory leaks, file/PDF failures, deprecated APIs, and major production bugs.
+
 ## 0.0.17
 - Updated ML Kit Document Scanner to v16.0.0 with safer scanning, better errors, and URI payload support.
 - Modernized Android stack (AGP 8.6, Kotlin 2.0.21, Gradle 8.7, Java/Kotlin 17, minSdk 21).
