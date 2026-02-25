@@ -199,6 +199,7 @@ public class SwiftFlutterDocScannerPlugin: NSObject, FlutterPlugin, VNDocumentCa
         }
 
         guard pdfDocument.write(to: pdfFilePath) else {
+            try? FileManager.default.removeItem(at: pdfFilePath)
             finishWithError(code: "PDF_CREATION_ERROR", message: "Failed to write PDF to disk")
             return
         }

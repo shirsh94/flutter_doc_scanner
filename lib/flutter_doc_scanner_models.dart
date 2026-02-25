@@ -26,9 +26,7 @@ class ImageScanResult {
   /// On iOS, the data is a List of file paths.
   factory ImageScanResult.fromPlatformData(dynamic data) {
     if (data is Map) {
-      final images = (data['images'] as List?)?.cast<String>() ??
-          (data['Uri'] as List?)?.cast<String>() ??
-          [];
+      final images = (data['images'] as List?)?.cast<String>() ?? [];
       return ImageScanResult(images: images);
     }
     if (data is List) {
