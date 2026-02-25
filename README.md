@@ -1,6 +1,6 @@
 # flutter_doc_scanner
 
-A Flutter plugin for document scanning on Android, iOS, and Web using ML Kit Document Scanner API and VisionKit.
+A Flutter plugin for document scanning on Android and iOS using ML Kit Document Scanner API and VisionKit.
 
 [![pub package](https://img.shields.io/pub/v/flutter_doc_scanner.svg)](https://pub.dev/packages/flutter_doc_scanner)
 
@@ -27,7 +27,10 @@ Check out the `example` directory for a sample Flutter app using `flutter_doc_sc
 - On-device processing helps preserve privacy.
 - Support for sending digitized files in PDF and JPEG formats back to your app.
 - Ability to set a scan page limit.
-- Support for image(png,jpeg) format and PDF has been added through various methods.
+- **Typed return models** (`ImageScanResult`, `PdfScanResult`) for type-safe result handling.
+- **Custom exceptions** (`DocScanException`) with error codes for proper error handling.
+- **Configurable image format** (`ImageFormat.jpeg` or `ImageFormat.png`) on iOS.
+- Camera permission checks on iOS before presenting the scanner.
 
 
 ## Installation
@@ -39,36 +42,117 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_doc_scanner: ^0.0.17
-
 ```
-Got it! Here's a more detailed explanation:
 
 ## Usage
 
-Use the following function for document scanning on Android and iOS:
+### Scan documents (default behavior)
+
+Returns PDF on Android, images (PNG) on iOS:
 
 ```dart
-  Future<void> scanDocument() async {
-  //by default way they fetch pdf for android and png for iOS
-  dynamic scannedDocuments;
+Future<void> scanDocument() async {
   try {
-    scannedDocuments = await FlutterDocScanner().getScanDocuments(page: 3) ??
-        'Unknown platform documents';
-  } on PlatformException {
-    scannedDocuments = 'Failed to get scanned documents.';
+    final scannedDocuments = await FlutterDocScanner().getScanDocuments(page: 3);
+    print(scannedDocuments.toString());
+  } on DocScanException catch (e) {
+    print('Scan failed: ${e.code} - ${e.message}');
   }
-  print(scannedDocuments.toString());
 }
 ```
-**Note-: If you want to obtain only a PDF scanned document, call getScannedDocumentAsPdf(). Similarly, if you want to get a scanned document in image format, use getScannedDocumentAsImages().**
 
-### Android result payloads
-- `getScanDocuments` / `getScannedDocumentAsPdf`: returns a map with `pdfUri` and `pageCount`.
-- `getScannedDocumentAsImages` / `getScanDocumentsUri`: returns a map with `images` (list of page URIs) and `count` (also exposed via legacy `Uri` / `Count` keys for backwards compatibility).
+### Scan as images (typed result)
+
+Returns an `ImageScanResult` with a list of file paths/URIs:
+
+```dart
+Future<void> scanAsImages() async {
+  try {
+    final result = await FlutterDocScanner().getScannedDocumentAsImages(
+      page: 4,
+      imageFormat: ImageFormat.jpeg, // or ImageFormat.png
+    );
+    if (result == null) {
+      print('User cancelled');
+      return;
+    }
+    print('Scanned ${result.count} images');
+    for (final path in result.images) {
+      print('Image: $path');
+    }
+  } on DocScanException catch (e) {
+    print('Scan failed: ${e.code} - ${e.message}');
+  }
+}
+```
+
+### Scan as PDF (typed result)
+
+Returns a `PdfScanResult` with the PDF file path/URI:
+
+```dart
+Future<void> scanAsPdf() async {
+  try {
+    final result = await FlutterDocScanner().getScannedDocumentAsPdf(page: 4);
+    if (result == null) {
+      print('User cancelled');
+      return;
+    }
+    print('PDF: ${result.pdfUri} (${result.pageCount} pages)');
+  } on DocScanException catch (e) {
+    print('Scan failed: ${e.code} - ${e.message}');
+  }
+}
+```
+
+### Scan document URIs (Android only)
+
+Returns an `ImageScanResult`. Throws `DocScanException` on non-Android platforms:
+
+```dart
+Future<void> scanDocumentUri() async {
+  try {
+    final result = await FlutterDocScanner().getScanDocumentsUri(page: 4);
+    if (result == null) {
+      print('User cancelled');
+      return;
+    }
+    print('URIs: ${result.images}');
+  } on DocScanException catch (e) {
+    print('Error: ${e.code} - ${e.message}');
+  }
+}
+```
+
+### Error handling
+
+All scan methods throw `DocScanException` on failure. Error codes include:
+
+| Code | Description |
+|------|-------------|
+| `NO_ACTIVITY` | No foreground activity available (Android) |
+| `SCAN_IN_PROGRESS` | Another scan is already running |
+| `SCAN_FAILED` | The scan operation failed |
+| `PDF_CREATION_ERROR` | Failed to create PDF (iOS) |
+| `PERMISSION_DENIED` | Camera permission was denied (iOS) |
+| `UNSUPPORTED_PLATFORM` | Feature not supported on this platform |
+
+Methods return `null` when the user cancels the scan.
+
+### Image format
+
+The `getScannedDocumentAsImages` method accepts an optional `imageFormat` parameter:
+
+| Platform | `ImageFormat.jpeg` | `ImageFormat.png` |
+|----------|-------------------|-------------------|
+| **Android** | JPEG (always, ML Kit default) | JPEG (ML Kit always returns JPEG) |
+| **iOS** | JPEG (0.9 quality) | PNG (lossless) |
+
+Default is `ImageFormat.jpeg`. On Android, ML Kit always returns JPEG regardless of this setting. On iOS, this controls the actual output format.
 
 
 ## Project Setup
-Follow the steps below to set up your Flutter project on Android, iOS, and Web.
+Follow the steps below to set up your Flutter project on Android and iOS.
 
 ### Android
 
@@ -98,42 +182,12 @@ platform :ios, '13.0'
 ```
 
 #### Permission Configuration
-1. Add a String property to the app's Info.plist file with the key `NSCameraUsageDescription` and the value as the description for why your app needs camera access. This step is required by Apple to explain to users why the app needs access to the camera, and it's crucial for App Store approval.
+Add a String property to the app's Info.plist file with the key `NSCameraUsageDescription` and the value as the description for why your app needs camera access. This step is required by Apple to explain to users why the app needs access to the camera, and it's crucial for App Store approval.
 
-```ruby
-  <key>NSCameraUsageDescription</key>
-  <string>Camera Permission Description</string>
+```xml
+<key>NSCameraUsageDescription</key>
+<string>Camera Permission Description</string>
 ```
-
-2. The `permission_handler` dependency used by `flutter_doc_scanner` uses macros to control whether a permission is enabled. To enable camera permission, add the following to your `Podfile` file. This step ensures that your app can request and handle camera permissions on iOS devices:
-
- ```ruby
-   post_install do |installer|
-     installer.pods_project.targets.each do |target|
-       ... # Here are some configurations automatically generated by flutter
-
-       # Start of the permission_handler configuration
-       target.build_configurations.each do |config|
-
-         # You can enable the permissions needed here. For example, to enable camera
-         # permission, just remove the `#` character in front so it looks like this:
-         #
-         # ## dart: PermissionGroup.camera
-         # 'PERMISSION_CAMERA=1'
-         #
-         #  Preprocessor definitions can be found at: https://github.com/Baseflow/flutter-permission-handler/blob/master/permission_handler_apple/ios/Classes/PermissionHandlerEnums.h
-         config.build_settings['GCC_PREPROCESSOR_DEFINITIONS'] ||= [
-           '$(inherited)',
-
-           ## dart: PermissionGroup.camera
-           'PERMISSION_CAMERA=1',
-         ]
-
-       end
-       # End of the permission_handler configuration
-     end
-   end
-   ```
 
 ### Web
 Currently, we have removed web support for this library. For document scanning on the web, you can use the following library: [flutter_doc_scanner_web](https://pub.dev/packages/flutter_doc_scanner_web).

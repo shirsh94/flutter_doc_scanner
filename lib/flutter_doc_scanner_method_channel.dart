@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
+import 'flutter_doc_scanner_exception.dart';
 import 'flutter_doc_scanner_platform_interface.dart';
 
 /// An implementation of [FlutterDocScannerPlatform] that uses method channels.
@@ -17,38 +18,66 @@ class MethodChannelFlutterDocScanner extends FlutterDocScannerPlatform {
   }
 
   @override
-  Future<dynamic> getScanDocuments([int page = 4]) async {
-    final data = await methodChannel.invokeMethod<dynamic>(
-      'getScanDocuments',
-      {'page': page},
-    );
-    return data;
+  Future<dynamic> getScanDocuments(int page) async {
+    try {
+      return await methodChannel.invokeMethod<dynamic>(
+        'getScanDocuments',
+        {'page': page},
+      );
+    } on PlatformException catch (e) {
+      throw DocScanException(
+        code: e.code,
+        message: e.message ?? 'Failed to scan documents',
+        details: e.details,
+      );
+    }
   }
 
   @override
-  Future<dynamic> getScannedDocumentAsImages([int page = 4]) async {
-    final data = await methodChannel.invokeMethod<dynamic>(
-      'getScannedDocumentAsImages',
-      {'page': page},
-    );
-    return data;
+  Future<dynamic> getScannedDocumentAsImages(int page, String imageFormat) async {
+    try {
+      return await methodChannel.invokeMethod<dynamic>(
+        'getScannedDocumentAsImages',
+        {'page': page, 'imageFormat': imageFormat},
+      );
+    } on PlatformException catch (e) {
+      throw DocScanException(
+        code: e.code,
+        message: e.message ?? 'Failed to scan document images',
+        details: e.details,
+      );
+    }
   }
 
   @override
-  Future<dynamic> getScannedDocumentAsPdf([int page = 4]) async {
-    final data = await methodChannel.invokeMethod<dynamic>(
-      'getScannedDocumentAsPdf',
-      {'page': page},
-    );
-    return data;
+  Future<dynamic> getScannedDocumentAsPdf(int page) async {
+    try {
+      return await methodChannel.invokeMethod<dynamic>(
+        'getScannedDocumentAsPdf',
+        {'page': page},
+      );
+    } on PlatformException catch (e) {
+      throw DocScanException(
+        code: e.code,
+        message: e.message ?? 'Failed to scan document as PDF',
+        details: e.details,
+      );
+    }
   }
 
   @override
-  Future<dynamic> getScanDocumentsUri([int page = 4]) async {
-    final data = await methodChannel.invokeMethod<dynamic>(
-      'getScanDocumentsUri',
-      {'page': page},
-    );
-    return data;
+  Future<dynamic> getScanDocumentsUri(int page) async {
+    try {
+      return await methodChannel.invokeMethod<dynamic>(
+        'getScanDocumentsUri',
+        {'page': page},
+      );
+    } on PlatformException catch (e) {
+      throw DocScanException(
+        code: e.code,
+        message: e.message ?? 'Failed to scan document URIs',
+        details: e.details,
+      );
+    }
   }
 }

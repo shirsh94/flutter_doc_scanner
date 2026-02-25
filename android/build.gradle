@@ -3,7 +3,7 @@ version '1.0-SNAPSHOT'
 
 buildscript {
     ///compatible with flutter 3.29
-    ext.kotlin_version = "2.0.21"
+    ext.kotlin_version = "2.1.0"
     repositories {
         google()
         mavenCentral()
@@ -49,6 +49,7 @@ android {
 
     defaultConfig {
         minSdkVersion 21
+        consumerProguardFiles 'consumer-rules.pro'
     }
 
     dependencies {

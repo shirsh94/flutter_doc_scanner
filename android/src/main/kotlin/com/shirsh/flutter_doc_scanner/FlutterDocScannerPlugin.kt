@@ -1,6 +1,5 @@
 package com.shirsh.flutter_doc_scanner
 
-
 import android.app.Activity
 import android.content.Intent
 import android.content.IntentSender
@@ -23,16 +22,17 @@ class FlutterDocScannerPlugin : MethodCallHandler, ActivityResultListener,
     private var channel: MethodChannel? = null
     private var activityBinding: ActivityPluginBinding? = null
     private val CHANNEL = "flutter_doc_scanner"
-    private var activity: Activity? = null
-    private var pendingResult: MethodChannel.Result? = null
+    @Volatile private var activity: Activity? = null
+    @Volatile private var pendingResult: MethodChannel.Result? = null
 
-    private val REQUEST_CODE_SCAN = 213312
-    private val REQUEST_CODE_SCAN_URI = 214412
-    private val REQUEST_CODE_SCAN_IMAGES = 215512
-    private val REQUEST_CODE_SCAN_PDF = 216612
-    private val DEFAULT_PAGE_LIMIT = 4
-    private val TAG = FlutterDocScannerPlugin::class.java.simpleName
-
+    companion object {
+        private const val REQUEST_CODE_SCAN = 213312
+        private const val REQUEST_CODE_SCAN_URI = 214412
+        private const val REQUEST_CODE_SCAN_IMAGES = 215512
+        private const val REQUEST_CODE_SCAN_PDF = 216612
+        private const val DEFAULT_PAGE_LIMIT = 4
+        private val TAG = FlutterDocScannerPlugin::class.java.simpleName
+    }
 
     override fun onMethodCall(call: MethodCall, result: Result) {
         when (call.method) {
@@ -80,13 +80,15 @@ class FlutterDocScannerPlugin : MethodCallHandler, ActivityResultListener,
             return
         }
 
-        if (pendingResult != null) {
-            result.error("SCAN_IN_PROGRESS", "Another scan is already running.", null)
-            return
+        synchronized(this) {
+            if (pendingResult != null) {
+                result.error("SCAN_IN_PROGRESS", "Another scan is already running.", null)
+                return
+            }
+            pendingResult = result
         }
 
         val pageLimit = (arguments?.get("page") as? Int)?.coerceAtLeast(1) ?: DEFAULT_PAGE_LIMIT
-        pendingResult = result
         launchDocumentScanner(currentActivity, pageLimit, requestCode, resultFormats)
     }
 
@@ -121,19 +123,25 @@ class FlutterDocScannerPlugin : MethodCallHandler, ActivityResultListener,
                         0,
                         null
                     )
+                } catch (e: IntentSender.SendIntentException) {
+                    Log.e(TAG, "Unable to launch document scanner", e)
+                    finishWithError("SCAN_FAILED", "Unable to launch document scanner", e)
                 } catch (e: Exception) {
                     Log.e(TAG, "Unable to launch document scanner", e)
-                    finishWithError("Unable to launch document scanner", e)
+                    finishWithError("SCAN_FAILED", "Unable to launch document scanner", e)
                 }
             }
             .addOnFailureListener { e ->
                 Log.e(TAG, "Unable to start document scanner", e)
-                finishWithError("Unable to start document scanner", e)
+                finishWithError("SCAN_FAILED", "Unable to start document scanner", e)
             }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?): Boolean {
-        if (pendingResult == null) return false
+        if (pendingResult == null) {
+            Log.w(TAG, "onActivityResult called but pendingResult is null (requestCode=$requestCode)")
+            return false
+        }
 
         return when (requestCode) {
             REQUEST_CODE_SCAN, REQUEST_CODE_SCAN_PDF -> {
@@ -153,7 +161,12 @@ class FlutterDocScannerPlugin : MethodCallHandler, ActivityResultListener,
     private fun handlePdfResult(resultCode: Int, data: Intent?) {
         when (resultCode) {
             Activity.RESULT_OK -> {
-                val pdf = GmsDocumentScanningResult.fromActivityResultIntent(data)?.getPdf()
+                val scanResult = GmsDocumentScanningResult.fromActivityResultIntent(data)
+                if (scanResult == null) {
+                    finishWithError("SCAN_FAILED", "Failed to parse scan result from intent")
+                    return
+                }
+                val pdf = scanResult.getPdf()
                 if (pdf != null) {
                     finishWithSuccess(
                         mapOf(
@@ -162,19 +175,24 @@ class FlutterDocScannerPlugin : MethodCallHandler, ActivityResultListener,
                         )
                     )
                 } else {
-                    finishWithError("No PDF result returned")
+                    finishWithError("SCAN_FAILED", "No PDF result returned from scanner")
                 }
             }
 
             Activity.RESULT_CANCELED -> finishWithSuccess(null)
-            else -> finishWithError("Failed to scan document (code $resultCode)")
+            else -> finishWithError("SCAN_FAILED", "Failed to scan document (resultCode=$resultCode)")
         }
     }
 
     private fun handleImageResult(resultCode: Int, data: Intent?) {
         when (resultCode) {
             Activity.RESULT_OK -> {
-                val pages = GmsDocumentScanningResult.fromActivityResultIntent(data)?.getPages()
+                val scanResult = GmsDocumentScanningResult.fromActivityResultIntent(data)
+                if (scanResult == null) {
+                    finishWithError("SCAN_FAILED", "Failed to parse scan result from intent")
+                    return
+                }
+                val pages = scanResult.getPages()
                 val imageUris =
                     pages?.mapNotNull { page -> page.getImageUri()?.toString() } ?: emptyList()
                 if (imageUris.isNotEmpty()) {
@@ -182,28 +200,30 @@ class FlutterDocScannerPlugin : MethodCallHandler, ActivityResultListener,
                         mapOf(
                             "images" to imageUris,
                             "count" to imageUris.size,
-                            "Uri" to imageUris, // Backward compatible keys
-                            "Count" to imageUris.size,
                         )
                     )
                 } else {
-                    finishWithError("No image results returned")
+                    finishWithError("SCAN_FAILED", "No image results returned from scanner")
                 }
             }
 
             Activity.RESULT_CANCELED -> finishWithSuccess(null)
-            else -> finishWithError("Failed to scan document (code $resultCode)")
+            else -> finishWithError("SCAN_FAILED", "Failed to scan document (resultCode=$resultCode)")
         }
     }
 
     private fun finishWithSuccess(payload: Any?) {
-        pendingResult?.success(payload)
-        pendingResult = null
+        synchronized(this) {
+            pendingResult?.success(payload)
+            pendingResult = null
+        }
     }
 
-    private fun finishWithError(message: String, throwable: Throwable? = null) {
-        pendingResult?.error("SCAN_FAILED", message, throwable?.localizedMessage)
-        pendingResult = null
+    private fun finishWithError(code: String, message: String, throwable: Throwable? = null) {
+        synchronized(this) {
+            pendingResult?.error(code, message, throwable?.localizedMessage)
+            pendingResult = null
+        }
     }
 
     override fun onAttachedToEngine(binding: FlutterPlugin.FlutterPluginBinding) {
@@ -223,17 +243,28 @@ class FlutterDocScannerPlugin : MethodCallHandler, ActivityResultListener,
     }
 
     override fun onDetachedFromActivityForConfigChanges() {
-        onDetachedFromActivity()
+        activityBinding?.removeActivityResultListener(this)
+        activityBinding = null
+        activity = null
+        // Note: pendingResult is intentionally NOT cleared here so the scan
+        // can still complete after a config change (e.g. device rotation).
     }
 
     override fun onReattachedToActivityForConfigChanges(binding: ActivityPluginBinding) {
-        onAttachedToActivity(binding)
+        activityBinding = binding
+        activity = binding.activity
+        activityBinding?.addActivityResultListener(this)
     }
 
     override fun onDetachedFromActivity() {
         activityBinding?.removeActivityResultListener(this)
         activityBinding = null
         activity = null
-        pendingResult = null
+        synchronized(this) {
+            if (pendingResult != null) {
+                pendingResult?.error("NO_ACTIVITY", "Activity was destroyed while scan was in progress", null)
+                pendingResult = null
+            }
+        }
     }
 }
