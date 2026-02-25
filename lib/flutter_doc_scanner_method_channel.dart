@@ -34,11 +34,11 @@ class MethodChannelFlutterDocScanner extends FlutterDocScannerPlatform {
   }
 
   @override
-  Future<dynamic> getScannedDocumentAsImages(int page, String imageFormat) async {
+  Future<dynamic> getScannedDocumentAsImages(int page, String imageFormat, double quality) async {
     try {
       return await methodChannel.invokeMethod<dynamic>(
         'getScannedDocumentAsImages',
-        {'page': page, 'imageFormat': imageFormat},
+        {'page': page, 'imageFormat': imageFormat, 'quality': quality},
       );
     } on PlatformException catch (e) {
       throw DocScanException(

@@ -60,7 +60,7 @@ void main() {
   });
 
   test('getScannedDocumentAsImages returns map', () async {
-    final result = await platform.getScannedDocumentAsImages(4, 'jpeg');
+    final result = await platform.getScannedDocumentAsImages(4, 'jpeg', 0.9);
     expect(result, isA<Map>());
     expect((result as Map)['images'], ['content://img1.jpg']);
   });
@@ -102,7 +102,7 @@ void main() {
         'getScannedDocumentAsImages wraps PlatformException as DocScanException',
         () async {
       expect(
-        () => platform.getScannedDocumentAsImages(4, 'jpeg'),
+        () => platform.getScannedDocumentAsImages(4, 'jpeg', 0.9),
         throwsA(isA<DocScanException>()),
       );
     });

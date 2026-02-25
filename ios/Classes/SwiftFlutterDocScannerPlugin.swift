@@ -10,6 +10,7 @@ public class SwiftFlutterDocScannerPlugin: NSObject, FlutterPlugin, VNDocumentCa
     private weak var presentingController: VNDocumentCameraViewController?
     private var currentMethod: String?
     private var currentImageFormat: String = "jpeg"
+    private var currentQuality: CGFloat = 0.9
     private var isScanInProgress: Bool = false
 
     public static func register(with registrar: FlutterPluginRegistrar) {
@@ -25,13 +26,14 @@ public class SwiftFlutterDocScannerPlugin: NSObject, FlutterPlugin, VNDocumentCa
         case "getScanDocuments", "getScannedDocumentAsImages", "getScannedDocumentAsPdf":
             let args = call.arguments as? [String: Any]
             let imageFormat = args?["imageFormat"] as? String ?? "jpeg"
-            startScan(method: call.method, imageFormat: imageFormat, result: result)
+            let quality = args?["quality"] as? Double ?? 0.9
+            startScan(method: call.method, imageFormat: imageFormat, quality: quality, result: result)
         default:
             result(FlutterMethodNotImplemented)
         }
     }
 
-    private func startScan(method: String, imageFormat: String, result: @escaping FlutterResult) {
+    private func startScan(method: String, imageFormat: String, quality: Double, result: @escaping FlutterResult) {
         if isScanInProgress {
             result(FlutterError(code: "SCAN_IN_PROGRESS", message: "Another scan is already running", details: nil))
             return
@@ -46,7 +48,7 @@ public class SwiftFlutterDocScannerPlugin: NSObject, FlutterPlugin, VNDocumentCa
             DispatchQueue.main.async {
                 guard let self = self else { return }
                 if granted {
-                    self.presentScanner(method: method, imageFormat: imageFormat, result: result)
+                    self.presentScanner(method: method, imageFormat: imageFormat, quality: quality, result: result)
                 } else {
                     result(FlutterError(code: "PERMISSION_DENIED", message: "Camera permission is required for document scanning", details: nil))
                 }
@@ -67,7 +69,7 @@ public class SwiftFlutterDocScannerPlugin: NSObject, FlutterPlugin, VNDocumentCa
         }
     }
 
-    private func presentScanner(method: String, imageFormat: String, result: @escaping FlutterResult) {
+    private func presentScanner(method: String, imageFormat: String, quality: Double, result: @escaping FlutterResult) {
         guard let rootVC = self.getRootViewController() else {
             result(FlutterError(code: "NO_VIEW_CONTROLLER", message: "Unable to find a view controller to present the scanner", details: nil))
             return
@@ -77,6 +79,7 @@ public class SwiftFlutterDocScannerPlugin: NSObject, FlutterPlugin, VNDocumentCa
         self.resultChannel = result
         self.currentMethod = method
         self.currentImageFormat = imageFormat
+        self.currentQuality = CGFloat(max(0.0, min(1.0, quality)))
 
         let scanner = VNDocumentCameraViewController()
         scanner.delegate = self
@@ -113,6 +116,7 @@ public class SwiftFlutterDocScannerPlugin: NSObject, FlutterPlugin, VNDocumentCa
         resultChannel = nil
         currentMethod = nil
         currentImageFormat = "jpeg"
+        currentQuality = 0.9
         isScanInProgress = false
     }
 
@@ -160,7 +164,7 @@ public class SwiftFlutterDocScannerPlugin: NSObject, FlutterPlugin, VNDocumentCa
             let url = tempDirPath.appendingPathComponent("\(formattedDate)-\(i).\(ext)")
             let imageData: Data?
             if useJpeg {
-                imageData = page.jpegData(compressionQuality: 0.9)
+                imageData = page.jpegData(compressionQuality: currentQuality)
             } else {
                 imageData = page.pngData()
             }

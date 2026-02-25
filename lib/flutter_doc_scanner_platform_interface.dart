@@ -39,7 +39,7 @@ abstract class FlutterDocScannerPlatform extends PlatformInterface {
   ///
   /// [imageFormat] controls the output format on iOS (Android always returns JPEG).
   /// Returns `null` if the user cancelled.
-  Future<dynamic> getScannedDocumentAsImages(int page, String imageFormat) {
+  Future<dynamic> getScannedDocumentAsImages(int page, String imageFormat, double quality) {
     throw UnimplementedError(
         'getScannedDocumentAsImages() has not been implemented.');
   }

@@ -30,6 +30,7 @@ Check out the `example` directory for a sample Flutter app using `flutter_doc_sc
 - **Typed return models** (`ImageScanResult`, `PdfScanResult`) for type-safe result handling.
 - **Custom exceptions** (`DocScanException`) with error codes for proper error handling.
 - **Configurable image format** (`ImageFormat.jpeg` or `ImageFormat.png`) on iOS.
+- **Configurable JPEG quality** (0.0–1.0) for iOS image compression control.
 - Camera permission checks on iOS before presenting the scanner.
 
 
@@ -146,9 +147,22 @@ The `getScannedDocumentAsImages` method accepts an optional `imageFormat` parame
 | Platform | `ImageFormat.jpeg` | `ImageFormat.png` |
 |----------|-------------------|-------------------|
 | **Android** | JPEG (always, ML Kit default) | JPEG (ML Kit always returns JPEG) |
-| **iOS** | JPEG (0.9 quality) | PNG (lossless) |
+| **iOS** | JPEG (configurable quality) | PNG (lossless) |
 
 Default is `ImageFormat.jpeg`. On Android, ML Kit always returns JPEG regardless of this setting. On iOS, this controls the actual output format.
+
+### JPEG quality (iOS only)
+
+When using `ImageFormat.jpeg`, you can control the compression quality on iOS with the `quality` parameter (0.0 to 1.0):
+
+```dart
+final result = await FlutterDocScanner().getScannedDocumentAsImages(
+  imageFormat: ImageFormat.jpeg,
+  quality: 0.7, // lower = smaller file, more compression
+);
+```
+
+Default is `0.9`. This parameter is ignored on Android (ML Kit controls quality) and when using `ImageFormat.png`.
 
 
 ## Project Setup
@@ -171,6 +185,9 @@ android {
     ...
 }
 ```
+
+#### Google Play Services Requirement
+This plugin uses [ML Kit Document Scanner](https://developers.google.com/ml-kit/vision/doc-scanner), which requires **Google Play Services** to be installed on the device. It will not work on devices without Google Play (e.g. Huawei devices with HMS, Amazon Fire tablets, custom ROMs without GApps). If Google Play Services are unavailable, the scanner will fail with a `SCAN_FAILED` error.
 
 ### iOS
 #### Minimum Version Configuration

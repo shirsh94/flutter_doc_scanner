@@ -28,15 +28,22 @@ class FlutterDocScanner {
   /// [imageFormat] controls the output image format. On iOS, this determines
   /// whether images are saved as PNG or JPEG. On Android, ML Kit always returns
   /// JPEG regardless of this setting. Defaults to [ImageFormat.jpeg].
+  /// [quality] controls JPEG compression quality on iOS (0.0 to 1.0, where 1.0
+  /// is highest quality). Only applies when [imageFormat] is [ImageFormat.jpeg].
+  /// Ignored on Android. Defaults to 0.9.
   /// Returns `null` if the user cancelled the scan.
   /// Throws [DocScanException] on failure.
   Future<ImageScanResult?> getScannedDocumentAsImages({
     int page = 4,
     ImageFormat imageFormat = ImageFormat.jpeg,
+    double quality = 0.9,
   }) async {
     _validatePage(page);
+    if (quality < 0.0 || quality > 1.0) {
+      throw ArgumentError.value(quality, 'quality', 'Must be between 0.0 and 1.0');
+    }
     final data = await FlutterDocScannerPlatform.instance
-        .getScannedDocumentAsImages(page, imageFormat.name);
+        .getScannedDocumentAsImages(page, imageFormat.name, quality);
     if (data == null) return null;
     return ImageScanResult.fromPlatformData(data);
   }

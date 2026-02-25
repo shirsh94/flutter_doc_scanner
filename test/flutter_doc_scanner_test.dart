@@ -15,7 +15,7 @@ class MockFlutterDocScannerPlatform
       Future.value(['path/to/image1.png', 'path/to/image2.png']);
 
   @override
-  Future<dynamic> getScannedDocumentAsImages(int page, String imageFormat) =>
+  Future<dynamic> getScannedDocumentAsImages(int page, String imageFormat, double quality) =>
       Future.value({'images': ['path/to/image1.png'], 'count': 1});
 
   @override
@@ -37,7 +37,7 @@ class MockCancelledScannerPlatform
   Future<dynamic> getScanDocuments(int page) => Future.value(null);
 
   @override
-  Future<dynamic> getScannedDocumentAsImages(int page, String imageFormat) => Future.value(null);
+  Future<dynamic> getScannedDocumentAsImages(int page, String imageFormat, double quality) => Future.value(null);
 
   @override
   Future<dynamic> getScannedDocumentAsPdf(int page) => Future.value(null);
@@ -88,6 +88,28 @@ void main() {
       );
       expect(result, isNotNull);
       expect(result!.images, ['path/to/image1.png']);
+    });
+
+    test('getScannedDocumentAsImages accepts quality parameter', () async {
+      final result = await scanner.getScannedDocumentAsImages(
+        quality: 0.5,
+      );
+      expect(result, isNotNull);
+      expect(result!.images, ['path/to/image1.png']);
+    });
+
+    test('quality validation rejects values above 1.0', () {
+      expect(
+        () => scanner.getScannedDocumentAsImages(quality: 1.5),
+        throwsA(isA<ArgumentError>()),
+      );
+    });
+
+    test('quality validation rejects negative values', () {
+      expect(
+        () => scanner.getScannedDocumentAsImages(quality: -0.1),
+        throwsA(isA<ArgumentError>()),
+      );
     });
 
     test('page validation rejects zero', () {
