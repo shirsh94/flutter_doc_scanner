@@ -10,8 +10,15 @@ class FlutterDocScanner {
     return FlutterDocScannerPlatform.instance.getScanDocuments(page);
   }
 
-  Future<dynamic> getScannedDocumentAsImages({int page = 4}) {
-    return FlutterDocScannerPlatform.instance.getScannedDocumentAsImages(page);
+  /// If [useAutomaticSinglePictureProcessing] is true, native code uses
+  /// a fast single-picture flow and ignores [page].
+  Future<dynamic> getScannedDocumentAsImages(
+      {int page = 4, bool useAutomaticSinglePictureProcessing = false}) {
+    return FlutterDocScannerPlatform.instance.getScannedDocumentAsImages(
+      page: page,
+      useAutomaticSinglePictureProcessing:
+          useAutomaticSinglePictureProcessing,
+    );
   }
 
   Future<dynamic> getScannedDocumentAsPdf({int page = 4}) {

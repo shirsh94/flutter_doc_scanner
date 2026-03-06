@@ -28,9 +28,41 @@ public class SwiftFlutterDocScannerPlugin: NSObject, FlutterPlugin, VNDocumentCa
            let presentedVC: UIViewController? = UIApplication.shared.keyWindow?.rootViewController
            self.resultChannel = result
            self.currentMethod = call.method
-           self.presentingController = VNDocumentCameraViewController()
-           self.presentingController!.delegate = self
-           presentedVC?.present(self.presentingController!, animated: true)
+           let arguments = call.arguments as? [String: Any]
+           let useAutomaticSinglePictureProcessing =
+               (arguments?["useAutomaticSinglePictureProcessing"] as? Bool) ?? false
+
+           if useAutomaticSinglePictureProcessing {
+               // New fast path: capture one picture and return immediately without review UI.
+               let controller = AutoScanViewController()
+               controller.modalPresentationStyle = .fullScreen
+               controller.onImageCaptured = { [weak self] image in
+                   guard let self = self else { return }
+                   DispatchQueue.global(qos: .userInitiated).async {
+                       do {
+                           let path = try self.saveSingleImage(image: image)
+                           DispatchQueue.main.async {
+                               self.resultChannel?([path])
+                           }
+                       } catch {
+                           DispatchQueue.main.async {
+                               self.resultChannel?(FlutterError(code: "SCAN_SAVE_ERROR", message: "Failed to save captured image", details: error.localizedDescription))
+                           }
+                       }
+                   }
+               }
+               controller.onCancel = { [weak self] in
+                   self?.resultChannel?(nil)
+               }
+               controller.onError = { [weak self] error in
+                   self?.resultChannel?(FlutterError(code: "SCAN_ERROR", message: "Failed to scan documents", details: error.localizedDescription))
+               }
+               presentedVC?.present(controller, animated: true)
+           } else {
+               self.presentingController = VNDocumentCameraViewController()
+               self.presentingController!.delegate = self
+               presentedVC?.present(self.presentingController!, animated: true)
+           }
        } else if call.method == "getScannedDocumentAsPdf" {
            let presentedVC: UIViewController? = UIApplication.shared.keyWindow?.rootViewController
            self.resultChannel = result
@@ -48,6 +80,20 @@ public class SwiftFlutterDocScannerPlugin: NSObject, FlutterPlugin, VNDocumentCa
        let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
        let documentsDirectory = paths[0]
        return documentsDirectory
+   }
+
+   private func saveSingleImage(image: UIImage) throws -> String {
+       let tempDirPath = getDocumentsDirectory()
+       let currentDateTime = Date()
+       let df = DateFormatter()
+       df.dateFormat = "yyyyMMdd-HHmmss"
+       let formattedDate = df.string(from: currentDateTime)
+       let imagePath = tempDirPath.appendingPathComponent(formattedDate + "-0.jpg")
+       guard let data = image.jpegData(compressionQuality: 0.78) else {
+           throw NSError(domain: "flutter_doc_scanner", code: 1001, userInfo: [NSLocalizedDescriptionKey: "Unable to encode JPEG data."])
+       }
+       try data.write(to: imagePath, options: .atomic)
+       return imagePath.path
    }
 
    public func documentCameraViewController(_ controller: VNDocumentCameraViewController, didFinishWith scan: VNDocumentCameraScan) {
