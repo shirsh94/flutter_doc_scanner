@@ -26,10 +26,15 @@ class MethodChannelFlutterDocScanner extends FlutterDocScannerPlatform {
   }
 
   @override
-  Future<dynamic> getScannedDocumentAsImages([int page = 4]) async {
+  Future<dynamic> getScannedDocumentAsImages(
+      {int page = 4, bool useAutomaticSinglePictureProcessing = false}) async {
     final data = await methodChannel.invokeMethod<dynamic>(
       'getScannedDocumentAsImages',
-      {'page': page},
+      {
+        'page': page,
+        'useAutomaticSinglePictureProcessing':
+            useAutomaticSinglePictureProcessing,
+      },
     );
     return data;
   }

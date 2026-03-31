@@ -31,7 +31,10 @@ abstract class FlutterDocScannerPlatform extends PlatformInterface {
     throw UnimplementedError('getScanDocuments() has not been implemented.');
   }
 
-  Future<dynamic> getScannedDocumentAsImages([int page = 4]) {
+  /// If [useAutomaticSinglePictureProcessing] is true, native code uses
+  /// a fast single-picture flow and ignores [page].
+  Future<dynamic> getScannedDocumentAsImages(
+      {int page = 4, bool useAutomaticSinglePictureProcessing = false}) {
     throw UnimplementedError(
         'getScannedDocumentAsImages() has not been implemented.');
   }
