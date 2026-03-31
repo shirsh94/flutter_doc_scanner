@@ -86,20 +86,42 @@ class FlutterDocScannerPlugin : MethodCallHandler, ActivityResultListener,
         }
 
         val pageLimit = (arguments?.get("page") as? Int)?.coerceAtLeast(1) ?: DEFAULT_PAGE_LIMIT
+        val useAutomaticSinglePictureProcessing =
+            (arguments?.get("useAutomaticSinglePictureProcessing") as? Boolean) ?: false
+        // New fast path: single page + base scanner mode (page argument is intentionally ignored).
+        val fastSinglePageMode =
+            requestCode == REQUEST_CODE_SCAN_IMAGES && useAutomaticSinglePictureProcessing
+        val effectivePageLimit = if (fastSinglePageMode) 1 else pageLimit
+        val scannerMode = if (fastSinglePageMode) {
+            GmsDocumentScannerOptions.SCANNER_MODE_BASE
+        } else {
+            GmsDocumentScannerOptions.SCANNER_MODE_FULL
+        }
+        val galleryImportAllowed = !fastSinglePageMode
+
         pendingResult = result
-        launchDocumentScanner(currentActivity, pageLimit, requestCode, resultFormats)
+        launchDocumentScanner(
+            currentActivity,
+            effectivePageLimit,
+            requestCode,
+            resultFormats,
+            scannerMode,
+            galleryImportAllowed
+        )
     }
 
     private fun launchDocumentScanner(
         currentActivity: Activity,
         pageLimit: Int,
         requestCode: Int,
-        resultFormats: IntArray
+        resultFormats: IntArray,
+        scannerMode: Int,
+        galleryImportAllowed: Boolean
     ) {
         val options = GmsDocumentScannerOptions.Builder()
-            .setGalleryImportAllowed(true)
+            .setGalleryImportAllowed(galleryImportAllowed)
             .setPageLimit(pageLimit)
-            .setScannerMode(GmsDocumentScannerOptions.SCANNER_MODE_FULL)
+            .setScannerMode(scannerMode)
         if (resultFormats.isNotEmpty()) {
             val firstFormat = resultFormats.first()
             val remainingFormats = resultFormats.drop(1).toIntArray()
@@ -175,8 +197,9 @@ class FlutterDocScannerPlugin : MethodCallHandler, ActivityResultListener,
         when (resultCode) {
             Activity.RESULT_OK -> {
                 val pages = GmsDocumentScanningResult.fromActivityResultIntent(data)?.getPages()
-                val imageUris =
-                    pages?.mapNotNull { page -> page.getImageUri()?.toString() } ?: emptyList()
+                val imageUris = pages
+                    ?.mapNotNull { page -> page.getImageUri()?.toString() }
+                    ?: emptyList()
                 if (imageUris.isNotEmpty()) {
                     finishWithSuccess(
                         mapOf(
