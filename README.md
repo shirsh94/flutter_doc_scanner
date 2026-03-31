@@ -39,7 +39,7 @@ To use this plugin, add `flutter_doc_scanner` as a dependency in your `pubspec.y
 dependencies:
   flutter:
     sdk: flutter
-  flutter_doc_scanner: ^0.0.18
+  flutter_doc_scanner: ^0.0.19
 
 ```
 Got it! Here's a more detailed explanation:
