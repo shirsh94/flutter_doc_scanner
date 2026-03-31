@@ -28,6 +28,7 @@ Check out the `example` directory for a sample Flutter app using `flutter_doc_sc
 - Support for sending digitized files in PDF and JPEG formats back to your app.
 - Ability to set a scan page limit.
 - Support for image(png,jpeg) format and PDF has been added through various methods.
+- Fast single-picture scanning mode via `useAutomaticSinglePictureProcessing` for quick one-document captures.
 
 
 ## Installation
@@ -38,7 +39,7 @@ To use this plugin, add `flutter_doc_scanner` as a dependency in your `pubspec.y
 dependencies:
   flutter:
     sdk: flutter
-  flutter_doc_scanner: ^0.0.18
+  flutter_doc_scanner: ^0.0.19
 
 ```
 Got it! Here's a more detailed explanation:

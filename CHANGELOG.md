@@ -1,3 +1,7 @@
+## 0.0.19
+- Added `useAutomaticSinglePictureProcessing` flag to enable a fast single-picture scanning mode optimized for quick one-document captures.
+- Implemented platform-specific optimizations (iOS custom auto-scan flow, Android fastest GMS mode) while preserving existing behavior by default.
+
 ## 0.0.18
 -Added typed models, structured errors, image format/quality control (iOS), validation, permission checks, tests, and dependency cleanup.
 -Fixed Android 15 crashes, lifecycle/thread issues, memory leaks, file/PDF failures, deprecated APIs, and major production bugs.
