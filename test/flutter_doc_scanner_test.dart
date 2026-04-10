@@ -11,18 +11,21 @@ class MockFlutterDocScannerPlatform
   Future<String?> getPlatformVersion() => Future.value('42');
 
   @override
-  Future<String?> getScanDocuments([int page = 4]) => Future.value();
+  Future<dynamic> getScanDocuments(int page) => Future.value();
 
   @override
-  Future<String?> getScannedDocumentAsImages(
-          {int page = 4, bool useAutomaticSinglePictureProcessing = false}) =>
-      Future.value();
+  Future<dynamic> getScannedDocumentAsImages({
+    required int page,
+    required String imageFormat,
+    required double quality,
+    bool useAutomaticSinglePictureProcessing = false,
+  }) => Future.value();
 
   @override
-  Future<String?> getScannedDocumentAsPdf([int page = 4]) => Future.value();
+  Future<dynamic> getScannedDocumentAsPdf(int page) => Future.value();
 
   @override
-  Future<String?> getScanDocumentsUri([int page = 4]) => Future.value();
+  Future<dynamic> getScanDocumentsUri(int page) => Future.value();
 }
 
 void main() {
