@@ -1,3 +1,7 @@
+## 0.0.20
+- Fixed breaking changes from 0.0.19
+- Restored typed models (ImageScanResult, PdfScanResult, DocScanException)
+
 ## 0.0.19
 - Added `useAutomaticSinglePictureProcessing` flag to enable a fast single-picture scanning mode optimized for quick one-document captures.
 - Implemented platform-specific optimizations (iOS custom auto-scan flow, Android fastest GMS mode) while preserving existing behavior by default.
