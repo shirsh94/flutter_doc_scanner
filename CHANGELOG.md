@@ -1,3 +1,7 @@
+## 0.0.21
+- Added full Swift Package Manager (SwiftPM) support for both iOS and macOS, while maintaining full CocoaPods compatibility.
+- Restructured native plugin sources to the new SwiftPM layout and removed the legacy Objective-C shim, with successful verification on both integration methods.
+
 ## 0.0.20
 - Fixed breaking changes from 0.0.19
 - Restored typed models (ImageScanResult, PdfScanResult, DocScanException)
