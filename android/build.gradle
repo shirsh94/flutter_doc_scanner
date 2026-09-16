@@ -2,17 +2,13 @@ group 'com.shirsh.flutter_doc_scanner'
 version '1.0-SNAPSHOT'
 
 buildscript {
-    ///compatible with flutter 3.29
-    ext.kotlin_version = "2.0.21"
     repositories {
         google()
         mavenCentral()
     }
 
     dependencies {
-        ///compatible with flutter 3.29
-        classpath 'com.android.tools.build:gradle:8.6.0'
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath 'com.android.tools.build:gradle:9.0.1'
     }
 }
 
@@ -24,7 +20,6 @@ allprojects {
 }
 
 apply plugin: 'com.android.library'
-apply plugin: 'kotlin-android'
 
 android {
     if (project.android.hasProperty("namespace")) {
@@ -36,10 +31,6 @@ android {
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
-    }
-
-    kotlinOptions {
-        jvmTarget = '17'
     }
 
     sourceSets {
@@ -68,6 +59,12 @@ android {
         }
     }
 }
+kotlin {
+    compilerOptions {
+        jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
+    }
+}
+
 dependencies {
     implementation 'com.google.android.gms:play-services-mlkit-document-scanner:16.0.0'
 }

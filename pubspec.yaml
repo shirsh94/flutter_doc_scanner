@@ -4,8 +4,8 @@ version: 0.0.21
 homepage: https://github.com/shirsh94/flutter_doc_scanner/
 
 environment:
-  sdk: '>=2.18.0 <4.0.0'
-  flutter: ">=1.17.0"
+  sdk: ^3.12.0
+  flutter: ">=3.44.0"
 
 dependencies:
   flutter:
