@@ -19,6 +19,7 @@ class MockFlutterDocScannerPlatform
     required String imageFormat,
     required double quality,
     bool useAutomaticSinglePictureProcessing = false,
+    String? scannerMode,
   }) => Future.value();
 
   @override

@@ -33,6 +33,7 @@ class FlutterDocScanner {
   /// Ignored on Android. Defaults to 0.9.
   /// If [useAutomaticSinglePictureProcessing] is true, native code uses
   /// a fast single-picture flow and ignores [page].
+  /// [scannerMode] controls the Android ML Kit scanner mode when provided.
   /// Returns `null` if the user cancelled the scan.
   /// Throws [DocScanException] on failure.
   Future<ImageScanResult?> getScannedDocumentAsImages({
@@ -40,6 +41,7 @@ class FlutterDocScanner {
     ImageFormat imageFormat = ImageFormat.jpeg,
     double quality = 0.9,
     bool useAutomaticSinglePictureProcessing = false,
+    DocumentScannerMode? scannerMode,
   }) async {
     _validatePage(page);
     if (quality < 0.0 || quality > 1.0) {
@@ -56,6 +58,7 @@ class FlutterDocScanner {
           quality: quality,
           useAutomaticSinglePictureProcessing:
               useAutomaticSinglePictureProcessing,
+          scannerMode: scannerMode?.name,
         );
     if (data == null) return null;
     return ImageScanResult.fromPlatformData(data);

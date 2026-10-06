@@ -39,16 +39,21 @@ class MethodChannelFlutterDocScanner extends FlutterDocScannerPlatform {
     required String imageFormat,
     required double quality,
     bool useAutomaticSinglePictureProcessing = false,
+    String? scannerMode,
   }) async {
     try {
-      return await methodChannel
-          .invokeMethod<dynamic>('getScannedDocumentAsImages', {
-            'page': page,
-            'imageFormat': imageFormat,
-            'quality': quality,
-            'useAutomaticSinglePictureProcessing':
-                useAutomaticSinglePictureProcessing,
-          });
+      final arguments = <String, dynamic>{
+        'page': page,
+        'imageFormat': imageFormat,
+        'quality': quality,
+        'useAutomaticSinglePictureProcessing':
+            useAutomaticSinglePictureProcessing,
+      };
+      if (scannerMode != null) {
+        arguments['scannerMode'] = scannerMode;
+      }
+      return await methodChannel.invokeMethod<dynamic>(
+          'getScannedDocumentAsImages', arguments);
     } on PlatformException catch (e) {
       throw DocScanException(
         code: e.code,

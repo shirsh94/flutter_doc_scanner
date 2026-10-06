@@ -40,12 +40,14 @@ abstract class FlutterDocScannerPlatform extends PlatformInterface {
   /// [imageFormat] controls the output format on iOS (Android always returns JPEG).
   /// If [useAutomaticSinglePictureProcessing] is true, native code uses
   /// a fast single-picture flow and ignores [page].
+  /// [scannerMode] controls the Android ML Kit scanner mode when provided.
   /// Returns `null` if the user cancelled.
   Future<dynamic> getScannedDocumentAsImages({
     required int page,
     required String imageFormat,
     required double quality,
     bool useAutomaticSinglePictureProcessing = false,
+    String? scannerMode,
   }) {
     throw UnimplementedError(
       'getScannedDocumentAsImages() has not been implemented.',
