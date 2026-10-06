@@ -10,6 +10,18 @@ enum ImageFormat {
   jpeg,
 }
 
+/// Native Android ML Kit document scanner mode.
+enum DocumentScannerMode {
+  /// Basic scanning/cropping without ML Kit filters/Auto Enhance.
+  base,
+
+  /// Basic scanning plus document filters and Auto Enhance.
+  filter,
+
+  /// Full ML Kit document scanning including filters and advanced image cleanup.
+  full,
+}
+
 /// Result from scanning documents as images.
 class ImageScanResult {
   /// List of file paths (iOS) or content URIs (Android) for the scanned images.

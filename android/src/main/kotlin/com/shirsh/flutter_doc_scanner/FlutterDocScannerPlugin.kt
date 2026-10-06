@@ -88,11 +88,18 @@ class FlutterDocScannerPlugin : MethodCallHandler, ActivityResultListener,
         val pageLimit = (arguments?.get("page") as? Int)?.coerceAtLeast(1) ?: DEFAULT_PAGE_LIMIT
         val useAutomaticSinglePictureProcessing =
             (arguments?.get("useAutomaticSinglePictureProcessing") as? Boolean) ?: false
-        // New fast path: single page + base scanner mode (page argument is intentionally ignored).
+        val scannerModeName = arguments?.get("scannerMode") as? String
+        val requestedScannerMode = when (scannerModeName) {
+            "base" -> GmsDocumentScannerOptions.SCANNER_MODE_BASE
+            "filter" -> GmsDocumentScannerOptions.SCANNER_MODE_BASE_WITH_FILTER
+            "full" -> GmsDocumentScannerOptions.SCANNER_MODE_FULL
+            else -> null
+        }
+        // Single-picture processing limits scanning to one page (page argument is intentionally ignored).
         val fastSinglePageMode =
             requestCode == REQUEST_CODE_SCAN_IMAGES && useAutomaticSinglePictureProcessing
         val effectivePageLimit = if (fastSinglePageMode) 1 else pageLimit
-        val scannerMode = if (fastSinglePageMode) {
+        val scannerMode = requestedScannerMode ?: if (fastSinglePageMode) {
             GmsDocumentScannerOptions.SCANNER_MODE_BASE
         } else {
             GmsDocumentScannerOptions.SCANNER_MODE_FULL

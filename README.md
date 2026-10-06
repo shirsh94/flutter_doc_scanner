@@ -63,6 +63,21 @@ Use the following function for document scanning on Android and iOS:
 ```
 **Note-: If you want to obtain only a PDF scanned document, call getScannedDocumentAsPdf(). Similarly, if you want to get a scanned document in image format, use getScannedDocumentAsImages().**
 
+### Android scanner mode
+
+- `DocumentScannerMode.base`: Basic scanning/cropping without ML Kit filters/Auto Enhance.
+- `DocumentScannerMode.filter`: Basic scanning plus document filters and Auto Enhance.
+- `DocumentScannerMode.full`: Full ML Kit document scanning including filters and advanced image cleanup.
+
+This option is ignored on iOS. When omitted, existing scanner behavior is preserved, including `useAutomaticSinglePictureProcessing`. An explicit mode overrides the mode selected by that option.
+
+```dart
+final result = await FlutterDocScanner().getScannedDocumentAsImages(
+  page: 1,
+  scannerMode: DocumentScannerMode.base,
+);
+```
+
 ### Android result payloads
 - `getScanDocuments` / `getScannedDocumentAsPdf`: returns a map with `pdfUri` and `pageCount`.
 - `getScannedDocumentAsImages` / `getScanDocumentsUri`: returns a map with `images` (list of page URIs) and `count` (also exposed via legacy `Uri` / `Count` keys for backwards compatibility).
