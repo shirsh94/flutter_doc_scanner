@@ -10,8 +10,6 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  flutter_web_plugins:
-    sdk: flutter
   plugin_platform_interface: ^2.0.2
 
 dev_dependencies:
@@ -47,9 +45,6 @@ flutter:
         pluginClass: FlutterDocScannerPlugin
       windows:
         pluginClass: FlutterDocScannerPluginCApi
-      web:
-        pluginClass: FlutterDocScannerWeb
-        fileName: flutter_doc_scanner_web.dart
 
   # To add assets to your plugin package, add an assets section, like this:
   # assets:
