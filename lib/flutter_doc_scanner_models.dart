@@ -77,3 +77,49 @@ class PdfScanResult {
   @override
   String toString() => 'PdfScanResult(pdfUri: $pdfUri, pageCount: $pageCount)';
 }
+
+/// Compression applied to the pages of a scanned PDF.
+///
+/// Pass it to [FlutterDocScanner.getScannedDocumentAsPdf] to get a smaller
+/// file. Each page is scaled down so its longest edge is at most
+/// [maxDimension] pixels and re-encoded as JPEG with [quality], then the PDF
+/// is assembled from those JPEGs. Each PDF page is as large as the scanned
+/// image before scaling (one point per pixel), so scaling changes the image
+/// resolution, not the page size.
+///
+/// Without a compression, the PDF is produced exactly as before.
+class DocScanCompression {
+  /// Creates a compression setting.
+  ///
+  /// [quality] is the JPEG quality from 0.0 (smallest) to 1.0 (best).
+  /// [maxDimension] is the maximum length in pixels of a page's longest edge;
+  /// pages that are already smaller are not scaled up. `null` keeps the
+  /// scanned resolution and only re-encodes.
+  const DocScanCompression({this.quality = 0.8, this.maxDimension});
+
+  /// JPEG quality from 0.0 to 1.0.
+  final double quality;
+
+  /// Maximum length in pixels of a page's longest edge, or `null` to keep the
+  /// scanned resolution.
+  final int? maxDimension;
+
+  /// The arguments sent to the platform side.
+  Map<String, Object> toMap() => {
+    'quality': quality,
+    if (maxDimension != null) 'maxDimension': maxDimension!,
+  };
+
+  @override
+  bool operator ==(Object other) =>
+      other is DocScanCompression &&
+      other.quality == quality &&
+      other.maxDimension == maxDimension;
+
+  @override
+  int get hashCode => Object.hash(quality, maxDimension);
+
+  @override
+  String toString() =>
+      'DocScanCompression(quality: $quality, maxDimension: $maxDimension)';
+}

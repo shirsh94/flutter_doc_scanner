@@ -64,12 +64,19 @@ class FlutterDocScanner {
   /// Scans documents and returns a PDF file path.
   ///
   /// [page] is the maximum number of pages to scan (must be >= 1, defaults to 4).
+  /// [compression] shrinks the PDF: every page is scaled down and re-encoded
+  /// as JPEG before the PDF is assembled (see [DocScanCompression]). When it
+  /// is `null` (the default), the PDF is produced exactly as before.
   /// Returns `null` if the user cancelled the scan.
   /// Throws [DocScanException] on failure.
-  Future<PdfScanResult?> getScannedDocumentAsPdf({int page = 4}) async {
+  Future<PdfScanResult?> getScannedDocumentAsPdf({
+    int page = 4,
+    DocScanCompression? compression,
+  }) async {
     _validatePage(page);
+    if (compression != null) _validateCompression(compression);
     final data = await FlutterDocScannerPlatform.instance
-        .getScannedDocumentAsPdf(page);
+        .getScannedDocumentAsPdf(page, compression: compression);
     if (data == null) return null;
     return PdfScanResult.fromPlatformData(data);
   }
@@ -97,6 +104,25 @@ class FlutterDocScanner {
   void _validatePage(int page) {
     if (page < 1) {
       throw ArgumentError.value(page, 'page', 'Must be at least 1');
+    }
+  }
+
+  void _validateCompression(DocScanCompression compression) {
+    final quality = compression.quality;
+    if (quality.isNaN || quality < 0.0 || quality > 1.0) {
+      throw ArgumentError.value(
+        quality,
+        'compression.quality',
+        'Must be between 0.0 and 1.0',
+      );
+    }
+    final maxDimension = compression.maxDimension;
+    if (maxDimension != null && maxDimension < 1) {
+      throw ArgumentError.value(
+        maxDimension,
+        'compression.maxDimension',
+        'Must be at least 1',
+      );
     }
   }
 }

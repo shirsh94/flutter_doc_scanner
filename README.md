@@ -63,6 +63,33 @@ Use the following function for document scanning on Android and iOS:
 ```
 **Note-: If you want to obtain only a PDF scanned document, call getScannedDocumentAsPdf(). Similarly, if you want to get a scanned document in image format, use getScannedDocumentAsImages().**
 
+### Compressing a scanned PDF
+
+By default the PDF holds every page at the full camera resolution, which quickly adds up
+to several megabytes per page. Pass a `DocScanCompression` to make it smaller:
+
+```dart
+final result = await FlutterDocScanner().getScannedDocumentAsPdf(
+  page: 5,
+  compression: const DocScanCompression(
+    quality: 0.7,       // JPEG quality, 0.0–1.0 (default 0.8)
+    maxDimension: 2500, // longest page edge in pixels; omit to keep the resolution
+  ),
+);
+```
+
+Every page is scaled down so its longest edge is at most `maxDimension` pixels (never scaled
+up), encoded as JPEG with `quality`, and embedded in the PDF as is. Each PDF page is as large
+as the scanned image before scaling (one point per pixel). Resolution has the bigger effect on file size: 2,500 px on
+the long edge of an A4 page is about 215 dpi, plenty for reading and OCR.
+
+- **iOS:** the pages from VisionKit are compressed before the PDF is written.
+- **Android:** ML Kit's own PDF output has no compression setting, so with `compression` set
+  the plugin asks ML Kit for JPEG pages, compresses them and writes the PDF itself
+  (`pdfUri` points at a file in the app's cache directory; `pageCount` is set as before).
+
+Without `compression`, nothing changes: you get exactly the PDF the plugin produced before.
+
 ### Android result payloads
 - `getScanDocuments` / `getScannedDocumentAsPdf`: returns a map with `pdfUri` and `pageCount`.
 - `getScannedDocumentAsImages` / `getScanDocumentsUri`: returns a map with `images` (list of page URIs) and `count` (also exposed via legacy `Uri` / `Count` keys for backwards compatibility).

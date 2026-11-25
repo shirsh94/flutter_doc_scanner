@@ -54,6 +54,12 @@ android {
     dependencies {
         testImplementation 'org.jetbrains.kotlin:kotlin-test'
         testImplementation 'org.mockito:mockito-core:5.0.0'
+        // PDF compression tests: Robolectric (JUnit 4, run through the vintage engine)
+        // for the Bitmap work, PDFBox to parse the PDFs the plugin writes.
+        testImplementation 'junit:junit:4.13.2'
+        testRuntimeOnly 'org.junit.vintage:junit-vintage-engine:5.10.2'
+        testImplementation 'org.robolectric:robolectric:4.14.1'
+        testImplementation 'org.apache.pdfbox:pdfbox:3.0.3'
     }
 
     testOptions {

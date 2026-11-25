@@ -4,6 +4,9 @@ package com.shirsh.flutter_doc_scanner
 import android.app.Activity
 import android.content.Intent
 import android.content.IntentSender
+import android.net.Uri
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import androidx.core.app.ActivityCompat.startIntentSenderForResult
 import com.google.mlkit.vision.documentscanner.GmsDocumentScannerOptions
@@ -17,6 +20,9 @@ import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
 import io.flutter.plugin.common.PluginRegistry.ActivityResultListener
+import java.io.File
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 
 class FlutterDocScannerPlugin : MethodCallHandler, ActivityResultListener,
     FlutterPlugin, ActivityAware {
@@ -25,11 +31,19 @@ class FlutterDocScannerPlugin : MethodCallHandler, ActivityResultListener,
     private val CHANNEL = "flutter_doc_scanner"
     private var activity: Activity? = null
     private var pendingResult: MethodChannel.Result? = null
+    /** Set while a compressed-PDF scan runs; read when ML Kit returns its JPEG pages. */
+    private var pendingPdfCompression: PdfCompression? = null
+    private val mainHandler by lazy { Handler(Looper.getMainLooper()) }
+    private val pdfExecutor: ExecutorService by lazy {
+        // A daemon thread, so an idle executor never keeps the process alive.
+        Executors.newSingleThreadExecutor { runnable -> Thread(runnable, "doc-scan-pdf").apply { isDaemon = true } }
+    }
 
     private val REQUEST_CODE_SCAN = 213312
     private val REQUEST_CODE_SCAN_URI = 214412
     private val REQUEST_CODE_SCAN_IMAGES = 215512
     private val REQUEST_CODE_SCAN_PDF = 216612
+    private val REQUEST_CODE_SCAN_PDF_COMPRESSED = 217712
     private val DEFAULT_PAGE_LIMIT = 4
     private val TAG = FlutterDocScannerPlugin::class.java.simpleName
 
@@ -52,12 +66,28 @@ class FlutterDocScannerPlugin : MethodCallHandler, ActivityResultListener,
                 REQUEST_CODE_SCAN_IMAGES,
                 intArrayOf(GmsDocumentScannerOptions.RESULT_FORMAT_JPEG)
             )
-            "getScannedDocumentAsPdf" -> startDocumentScan(
-                result,
-                call.arguments as? Map<*, *>,
-                REQUEST_CODE_SCAN_PDF,
-                intArrayOf(GmsDocumentScannerOptions.RESULT_FORMAT_PDF)
-            )
+            "getScannedDocumentAsPdf" -> {
+                val arguments = call.arguments as? Map<*, *>
+                val compression = PdfCompression.fromArguments(arguments)
+                if (compression == null) {
+                    startDocumentScan(
+                        result,
+                        arguments,
+                        REQUEST_CODE_SCAN_PDF,
+                        intArrayOf(GmsDocumentScannerOptions.RESULT_FORMAT_PDF)
+                    )
+                } else {
+                    // ML Kit's PDF output cannot be compressed, so ask for JPEG pages
+                    // and assemble the PDF ourselves once they are shrunk.
+                    startDocumentScan(
+                        result,
+                        arguments,
+                        REQUEST_CODE_SCAN_PDF_COMPRESSED,
+                        intArrayOf(GmsDocumentScannerOptions.RESULT_FORMAT_JPEG),
+                        compression
+                    )
+                }
+            }
             "getScanDocumentsUri" -> startDocumentScan(
                 result,
                 call.arguments as? Map<*, *>,
@@ -72,7 +102,8 @@ class FlutterDocScannerPlugin : MethodCallHandler, ActivityResultListener,
         result: Result,
         arguments: Map<*, *>?,
         requestCode: Int,
-        resultFormats: IntArray
+        resultFormats: IntArray,
+        pdfCompression: PdfCompression? = null
     ) {
         val currentActivity = activity
         if (currentActivity == null) {
@@ -100,6 +131,7 @@ class FlutterDocScannerPlugin : MethodCallHandler, ActivityResultListener,
         val galleryImportAllowed = !fastSinglePageMode
 
         pendingResult = result
+        pendingPdfCompression = pdfCompression
         launchDocumentScanner(
             currentActivity,
             effectivePageLimit,
@@ -168,6 +200,11 @@ class FlutterDocScannerPlugin : MethodCallHandler, ActivityResultListener,
                 true
             }
 
+            REQUEST_CODE_SCAN_PDF_COMPRESSED -> {
+                handleCompressedPdfResult(resultCode, data)
+                true
+            }
+
             else -> false
         }
     }
@@ -190,6 +227,61 @@ class FlutterDocScannerPlugin : MethodCallHandler, ActivityResultListener,
 
             Activity.RESULT_CANCELED -> finishWithSuccess(null)
             else -> finishWithError("Failed to scan document (code $resultCode)")
+        }
+    }
+
+    private fun handleCompressedPdfResult(resultCode: Int, data: Intent?) {
+        when (resultCode) {
+            Activity.RESULT_OK -> {
+                val compression = pendingPdfCompression
+                val context = activity?.applicationContext
+                val pageUris = GmsDocumentScanningResult.fromActivityResultIntent(data)
+                    ?.getPages()
+                    ?.mapNotNull { page -> page.getImageUri() }
+                    ?: emptyList()
+                when {
+                    compression == null || context == null ->
+                        finishWithError("Scanner state was lost before the PDF could be created")
+                    pageUris.isEmpty() -> finishWithError("No PDF result returned")
+                    else -> buildCompressedPdf(context, pageUris, compression)
+                }
+            }
+
+            Activity.RESULT_CANCELED -> finishWithSuccess(null)
+            else -> finishWithError("Failed to scan document (code $resultCode)")
+        }
+    }
+
+    /** Decoding and encoding pages takes a moment, so it runs off the main thread. */
+    private fun buildCompressedPdf(
+        context: android.content.Context,
+        pageUris: List<Uri>,
+        compression: PdfCompression
+    ) {
+        pdfExecutor.execute {
+            try {
+                val output = File(context.cacheDir, "doc_scan_${System.currentTimeMillis()}.pdf")
+                val sources = pageUris.map { uri ->
+                    {
+                        context.contentResolver.openInputStream(uri)?.use { it.readBytes() }
+                            ?: throw java.io.IOException("Cannot read scanned page $uri")
+                    }
+                }
+                CompressedPdfBuilder.build(sources, compression, output)
+                mainHandler.post {
+                    finishWithSuccess(
+                        mapOf(
+                            "pdfUri" to Uri.fromFile(output).toString(),
+                            "pageCount" to pageUris.size,
+                        )
+                    )
+                }
+            } catch (e: Throwable) {
+                // Throwable, not Exception: decoding a page can run out of memory, and an
+                // uncaught OutOfMemoryError would leave the scan pending forever.
+                Log.e(TAG, "Unable to create compressed PDF", e)
+                mainHandler.post { finishWithError("Failed to create compressed PDF", e) }
+            }
         }
     }
 
@@ -222,11 +314,13 @@ class FlutterDocScannerPlugin : MethodCallHandler, ActivityResultListener,
     private fun finishWithSuccess(payload: Any?) {
         pendingResult?.success(payload)
         pendingResult = null
+        pendingPdfCompression = null
     }
 
     private fun finishWithError(message: String, throwable: Throwable? = null) {
         pendingResult?.error("SCAN_FAILED", message, throwable?.localizedMessage)
         pendingResult = null
+        pendingPdfCompression = null
     }
 
     override fun onAttachedToEngine(binding: FlutterPlugin.FlutterPluginBinding) {
@@ -258,5 +352,6 @@ class FlutterDocScannerPlugin : MethodCallHandler, ActivityResultListener,
         activityBinding = null
         activity = null
         pendingResult = null
+        pendingPdfCompression = null
     }
 }

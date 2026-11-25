@@ -1,6 +1,7 @@
 import 'package:plugin_platform_interface/plugin_platform_interface.dart';
 
 import 'flutter_doc_scanner_method_channel.dart';
+import 'flutter_doc_scanner_models.dart';
 
 abstract class FlutterDocScannerPlatform extends PlatformInterface {
   /// Constructs a FlutterDocScannerPlatform.
@@ -54,8 +55,13 @@ abstract class FlutterDocScannerPlatform extends PlatformInterface {
 
   /// Scans documents and returns raw PDF data from the platform.
   ///
+  /// [compression], when set, asks the platform to scale down and JPEG-encode
+  /// every page before assembling the PDF. `null` keeps the platform's own PDF.
   /// Returns `null` if the user cancelled.
-  Future<dynamic> getScannedDocumentAsPdf(int page) {
+  Future<dynamic> getScannedDocumentAsPdf(
+    int page, {
+    DocScanCompression? compression,
+  }) {
     throw UnimplementedError(
       'getScannedDocumentAsPdf() has not been implemented.',
     );
