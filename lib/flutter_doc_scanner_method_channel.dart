@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
 import 'flutter_doc_scanner_exception.dart';
+import 'flutter_doc_scanner_models.dart';
 import 'flutter_doc_scanner_platform_interface.dart';
 
 /// An implementation of [FlutterDocScannerPlatform] that uses method channels.
@@ -59,11 +60,19 @@ class MethodChannelFlutterDocScanner extends FlutterDocScannerPlatform {
   }
 
   @override
-  Future<dynamic> getScannedDocumentAsPdf(int page) async {
+  Future<dynamic> getScannedDocumentAsPdf(
+    int page, {
+    DocScanCompression? compression,
+  }) async {
     try {
       return await methodChannel.invokeMethod<dynamic>(
         'getScannedDocumentAsPdf',
-        {'page': page},
+        {
+          'page': page,
+          // Left out entirely when not set, so the native side keeps its
+          // original code path for existing callers.
+          if (compression != null) 'compression': compression.toMap(),
+        },
       );
     } on PlatformException catch (e) {
       throw DocScanException(

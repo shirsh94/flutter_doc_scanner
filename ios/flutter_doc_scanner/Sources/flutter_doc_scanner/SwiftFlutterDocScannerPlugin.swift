@@ -9,6 +9,9 @@ public class SwiftFlutterDocScannerPlugin: NSObject, FlutterPlugin, VNDocumentCa
    var resultChannel: FlutterResult?
    var presentingController: VNDocumentCameraViewController?
    var currentMethod: String?
+   /// Set by `getScannedDocumentAsPdf` when the call carries a `compression`; `nil` keeps
+   /// the original PDFKit output.
+   var pendingPdfCompression: PdfCompression?
 
    public static func register(with registrar: FlutterPluginRegistrar) {
        let channel = FlutterMethodChannel(name: "flutter_doc_scanner", binaryMessenger: registrar.messenger())
@@ -67,6 +70,7 @@ public class SwiftFlutterDocScannerPlugin: NSObject, FlutterPlugin, VNDocumentCa
            let presentedVC: UIViewController? = UIApplication.shared.keyWindow?.rootViewController
            self.resultChannel = result
            self.currentMethod = call.method
+           self.pendingPdfCompression = PdfCompression(arguments: call.arguments)
            self.presentingController = VNDocumentCameraViewController()
            self.presentingController!.delegate = self
            presentedVC?.present(self.presentingController!, animated: true)
@@ -102,7 +106,11 @@ public class SwiftFlutterDocScannerPlugin: NSObject, FlutterPlugin, VNDocumentCa
        } else if currentMethod == "getScannedDocumentAsImages" {
            saveScannedImages(scan: scan)
        } else if currentMethod == "getScannedDocumentAsPdf" {
-           saveScannedPdf(scan: scan)
+           if let compression = pendingPdfCompression {
+               saveCompressedPdf(scan: scan, compression: compression)
+           } else {
+               saveScannedPdf(scan: scan)
+           }
        }
        presentingController?.dismiss(animated: true)
    }
@@ -147,7 +155,31 @@ public class SwiftFlutterDocScannerPlugin: NSObject, FlutterPlugin, VNDocumentCa
        }
    }
 
+   /// Scales and JPEG-encodes every page, then writes the PDF. The encoding runs off the main
+   /// thread; the result is delivered back on it.
+   private func saveCompressedPdf(scan: VNDocumentCameraScan, compression: PdfCompression) {
+       pendingPdfCompression = nil
+       let df = DateFormatter()
+       df.dateFormat = "yyyyMMdd-HHmmss"
+       let pdfFilePath = getDocumentsDirectory().appendingPathComponent("\(df.string(from: Date())).pdf")
+       let pages = (0 ..< scan.pageCount).map { scan.imageOfPage(at: $0) }
+       let result = resultChannel
+
+       DispatchQueue.global(qos: .userInitiated).async {
+           do {
+               let data = try CompressedPdfBuilder.build(pages: pages, compression: compression)
+               try data.write(to: pdfFilePath, options: .atomic)
+               DispatchQueue.main.async { result?(pdfFilePath.path) }
+           } catch {
+               DispatchQueue.main.async {
+                   result?(FlutterError(code: "PDF_CREATION_ERROR", message: "Failed to create PDF", details: String(describing: error)))
+               }
+           }
+       }
+   }
+
    public func documentCameraViewControllerDidCancel(_ controller: VNDocumentCameraViewController) {
+       pendingPdfCompression = nil
        resultChannel?(nil)
        presentingController?.dismiss(animated: true)
    }

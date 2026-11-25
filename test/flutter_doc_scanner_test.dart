@@ -22,7 +22,10 @@ class MockFlutterDocScannerPlatform
   }) => Future.value();
 
   @override
-  Future<dynamic> getScannedDocumentAsPdf(int page) => Future.value();
+  Future<dynamic> getScannedDocumentAsPdf(
+    int page, {
+    DocScanCompression? compression,
+  }) => Future.value();
 
   @override
   Future<dynamic> getScanDocumentsUri(int page) => Future.value();

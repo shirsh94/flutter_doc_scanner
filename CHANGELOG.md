@@ -1,3 +1,7 @@
+## Unreleased
+- Added optional PDF compression: `getScannedDocumentAsPdf(compression: DocScanCompression(quality:, maxDimension:))` scales every page down and embeds it as JPEG, on iOS and Android. Without `compression` the output is unchanged.
+- Added unit tests for the compression on the Dart, Android (JUnit/Robolectric) and iOS (XCTest) side; fixed the iOS `RunnerTests`, which referenced a class that does not exist on iOS.
+
 ## 0.0.21
 - Added full Swift Package Manager (SwiftPM) support for both iOS and macOS, while maintaining full CocoaPods compatibility.
 - Restructured native plugin sources to the new SwiftPM layout and removed the legacy Objective-C shim, with successful verification on both integration methods.
